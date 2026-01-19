@@ -11,12 +11,12 @@ module.exports = defineConfig({
 
   // Global retries
   retries: {
-    runMode: 1,
+    runMode: 2,
     openMode: 0
   },
 
   e2e: {
-    baseUrl: 'https://your-hub-application.com',
+    baseUrl: 'https://hub.development.circuly.io/en/auth/login',
     viewportWidth: 1920,
     viewportHeight: 1080,
     video: true,
@@ -33,22 +33,12 @@ module.exports = defineConfig({
       // Checkout URL (from your previous project)
       url: 'https://circuly-checkout-development.herokuapp.com/en/',
 
-      // Shopify configuration
-      shopify_base_url: 'https://your-shopify-store.myshopify.com',
-      shopify_admin_url: 'https://your-shopify-store.myshopify.com/admin',
-      shopify_api_url: 'https://your-shopify-store.myshopify.com/admin/api/2024-01',
-
-      // Database configuration (for MySQL)
-      db_host: 'localhost',
-      db_user: 'your_db_user',
-      db_password: 'your_db_password',
-      db_name: 'hub_database',
-
       // PostgreSQL configuration (from your previous project)
-      pg_user: 'XYZZZZZ',
-      pg_password: 'XYZZZZZ',
-      pg_host: 'XYZ',
+      pg_user: 'ZdFFUsWiIuILvub',
+      pg_password: 'rxoz32pYOeqYEAMVG263',
+      pg_host: 'circuly-development-v12.csmudpdd3zlm.eu-central-1.rds.amazonaws.com',
       pg_database: 'postgres',
+      ssl: false,
       pg_port: 5432,
     },
 
@@ -64,9 +54,9 @@ module.exports = defineConfig({
         async queryDb(queryString) {
           const { Client } = require("pg");
           const pgConfig = {
-            user: config.env.pg_user || "XYZZZZZ",
-            password: config.env.pg_password || "XYZZZZZ",
-            host: config.env.pg_host || "XYZ",
+            user: config.env.pg_user || "ZdFFUsWiIuILvub",
+            password: config.env.pg_password || "rxoz32pYOeqYEAMVG263",
+            host: config.env.pg_host || "development",
             database: config.env.pg_database || "postgres",
             ssl: false,
             port: config.env.pg_port || 5432,

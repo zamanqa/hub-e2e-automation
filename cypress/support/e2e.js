@@ -5,6 +5,7 @@ import 'cypress-mochawesome-reporter/register';
 import './commands/customer-commands';
 import './commands/product-commands';
 import './commands/order-commands';
+import './commands/database-commands';
 
 // Global configuration
 Cypress.on('uncaught:exception', (err, runnable) => {
