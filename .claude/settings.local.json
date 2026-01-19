@@ -9,7 +9,9 @@
       "Bash(git branch:*)",
       "Bash(npm install)",
       "Bash(npx cypress verify)",
-      "Bash(npx cypress:*)"
+      "Bash(npx cypress:*)",
+      "Bash(git checkout:*)",
+      "Bash(git merge:*)"
     ]
   }
 }
