@@ -5,14 +5,14 @@
   "main": "index.js",
   "scripts": {
     "cy:open": "node_modules\\.bin\\cypress open",
-    "cy:run": "cypress run --record --key $CYPRESS_RECORD_KEY",
-    "cy:run:chrome": "cypress run --browser chrome --record --key $CYPRESS_RECORD_KEY",
-    "cy:health-check": "cypress run --config-file cypress.health-check.config.js --record --key $CYPRESS_RECORD_KEY",
-    "cy:run:customers": "cypress run --spec 'cypress/e2e/01-customers/**/*.cy.js' --record --key $CYPRESS_RECORD_KEY",
-    "cy:run:products": "cypress run --spec 'cypress/e2e/02-products/**/*.cy.js' --record --key $CYPRESS_RECORD_KEY",
-    "cy:run:orders": "cypress run --spec 'cypress/e2e/03-orders/**/*.cy.js' --record --key $CYPRESS_RECORD_KEY",
-    "allHubTestHead": "npx cypress run --record --key $CYPRESS_RECORD_KEY --browser chrome --headed --spec 'cypress/e2e/**/*.cy.js'",
-    "allHubTestHeadless": "npx cypress run --record --key $CYPRESS_RECORD_KEY --browser chrome --headless --spec 'cypress/e2e/**/*.cy.js'",
+    "cy:run": "cypress run --record --key 6392946b-2a56-4996-8ab1-987cc71c67bd",
+    "cy:run:chrome": "cypress run --browser chrome --record --key 6392946b-2a56-4996-8ab1-987cc71c67bd",
+    "cy:health-check": "cypress run --config-file cypress.health-check.config.js --record --key 6392946b-2a56-4996-8ab1-987cc71c67bd",
+    "cy:run:customers": "cypress run --spec 'cypress/e2e/01-customers/**/*.cy.js' --record --key 6392946b-2a56-4996-8ab1-987cc71c67bd",
+    "cy:run:products": "cypress run --spec 'cypress/e2e/02-products/**/*.cy.js' --record --key 6392946b-2a56-4996-8ab1-987cc71c67bd",
+    "cy:run:orders": "cypress run --spec 'cypress/e2e/03-orders/**/*.cy.js' --record --key 6392946b-2a56-4996-8ab1-987cc71c67bd",
+    "allHubTestHead": "npx cypress run --record --key 6392946b-2a56-4996-8ab1-987cc71c67bd --browser chrome --headed --spec 'cypress/e2e/**/*.cy.js'",
+    "allHubTestHeadless": "npx cypress run --record --key 6392946b-2a56-4996-8ab1-987cc71c67bd --browser chrome --headless --spec 'cypress/e2e/**/*.cy.js'",
     "test": "npm run cy:health-check"
   },
   "keywords": [
