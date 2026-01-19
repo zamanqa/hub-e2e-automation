@@ -7,10 +7,11 @@
     "cy:open": "cypress open",
     "cy:run": "cypress run",
     "cy:run:chrome": "cypress run --browser chrome",
+    "cy:health-check": "cypress run --config-file cypress.health-check.config.js",
     "cy:run:customers": "cypress run --spec 'cypress/e2e/01-customers/**/*.cy.js'",
     "cy:run:products": "cypress run --spec 'cypress/e2e/02-products/**/*.cy.js'",
     "cy:run:orders": "cypress run --spec 'cypress/e2e/03-orders/**/*.cy.js'",
-    "test": "cypress run"
+    "test": "npm run cy:health-check"
   },
   "keywords": [
     "cypress",
