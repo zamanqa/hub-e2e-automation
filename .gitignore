@@ -3,6 +3,9 @@ cypress/videos/
 cypress/screenshots/
 cypress/downloads/
 reports/
+screenshots/
+videos/
+scripts/
 .env
 *.log
 .DS_Store
