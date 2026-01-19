@@ -5,14 +5,14 @@
   "main": "index.js",
   "scripts": {
     "cy:open": "node_modules\\.bin\\cypress open",
-    "cy:run": "cross-env CYPRESS_RECORD_KEY=6392946b-2a56-4996-8ab1-987cc71c67bd cypress run --record",
-    "cy:run:chrome": "cross-env CYPRESS_RECORD_KEY=6392946b-2a56-4996-8ab1-987cc71c67bd cypress run --browser chrome --record",
-    "cy:health-check": "cross-env CYPRESS_RECORD_KEY=6392946b-2a56-4996-8ab1-987cc71c67bd cypress run --config-file cypress.health-check.config.js --record",
-    "cy:run:customers": "cross-env CYPRESS_RECORD_KEY=6392946b-2a56-4996-8ab1-987cc71c67bd cypress run --spec 'cypress/e2e/01-customers/**/*.cy.js' --record",
-    "cy:run:products": "cross-env CYPRESS_RECORD_KEY=6392946b-2a56-4996-8ab1-987cc71c67bd cypress run --spec 'cypress/e2e/02-products/**/*.cy.js' --record",
-    "cy:run:orders": "cross-env CYPRESS_RECORD_KEY=6392946b-2a56-4996-8ab1-987cc71c67bd cypress run --spec 'cypress/e2e/03-orders/**/*.cy.js' --record",
-    "allHubTestHead": "cross-env CYPRESS_RECORD_KEY=6392946b-2a56-4996-8ab1-987cc71c67bd npx cypress run --record --browser chrome --headed --spec 'cypress/e2e/**/*.cy.js'",
-    "allHubTestHeadless": "cross-env CYPRESS_RECORD_KEY=6392946b-2a56-4996-8ab1-987cc71c67bd npx cypress run --record --browser chrome --headless --spec 'cypress/e2e/**/*.cy.js'",
+    "cy:run": "node scripts/run-cypress.js run",
+    "cy:run:chrome": "node scripts/run-cypress.js run --browser chrome",
+    "cy:health-check": "node scripts/run-cypress.js run --config-file cypress.health-check.config.js",
+    "cy:run:customers": "node scripts/run-cypress.js run --spec 'cypress/e2e/01-customers/**/*.cy.js'",
+    "cy:run:products": "node scripts/run-cypress.js run --spec 'cypress/e2e/02-products/**/*.cy.js'",
+    "cy:run:orders": "node scripts/run-cypress.js run --spec 'cypress/e2e/03-orders/**/*.cy.js'",
+    "allHubTestHead": "node scripts/run-cypress.js run --browser chrome --headed --spec 'cypress/e2e/**/*.cy.js'",
+    "allHubTestHeadless": "node scripts/run-cypress.js run --browser chrome --headless --spec 'cypress/e2e/**/*.cy.js'",
     "test": "npm run cy:health-check"
   },
   "keywords": [
