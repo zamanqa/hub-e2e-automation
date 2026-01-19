@@ -24,7 +24,6 @@ module.exports = defineConfig({
     requestTimeout: 15000,
     responseTimeout: 15000,
     pageLoadTimeout: 30000,
-    experimentalSessionAndOrigin: true,
 
     // Spec pattern for test files
     specPattern: 'cypress/e2e/**/*.cy.js',
