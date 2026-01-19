@@ -4,14 +4,13 @@
   "description": "Cypress E2E automation for HUB application - Shopify platform",
   "main": "index.js",
   "scripts": {
-    "cy:open": "cypress open",
-    "cy:run": "cypress run",
-    "cy:run:chrome": "cypress run --browser chrome",
-    "cy:run:record": "cypress run --record --key $CYPRESS_RECORD_KEY",
-    "cy:health-check": "cypress run --config-file cypress.health-check.config.js",
-    "cy:run:customers": "cypress run --spec 'cypress/e2e/01-customers/**/*.cy.js'",
-    "cy:run:products": "cypress run --spec 'cypress/e2e/02-products/**/*.cy.js'",
-    "cy:run:orders": "cypress run --spec 'cypress/e2e/03-orders/**/*.cy.js'",
+    "cy:open": "node_modules\\.bin\\cypress open",
+    "cy:run": "cypress run --record --key $CYPRESS_RECORD_KEY",
+    "cy:run:chrome": "cypress run --browser chrome --record --key $CYPRESS_RECORD_KEY",
+    "cy:health-check": "cypress run --config-file cypress.health-check.config.js --record --key $CYPRESS_RECORD_KEY",
+    "cy:run:customers": "cypress run --spec 'cypress/e2e/01-customers/**/*.cy.js' --record --key $CYPRESS_RECORD_KEY",
+    "cy:run:products": "cypress run --spec 'cypress/e2e/02-products/**/*.cy.js' --record --key $CYPRESS_RECORD_KEY",
+    "cy:run:orders": "cypress run --spec 'cypress/e2e/03-orders/**/*.cy.js' --record --key $CYPRESS_RECORD_KEY",
     "test": "npm run cy:health-check"
   },
   "keywords": [
