@@ -1,5 +1,8 @@
 const { defineConfig } = require('cypress');
 
+// Load environment variables from .env file
+require('dotenv').config();
+
 module.exports = defineConfig({
   projectId: "fenkjz",
   e2e: {
