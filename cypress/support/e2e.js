@@ -1,3 +1,6 @@
+// Import cypress-mochawesome-reporter
+import 'cypress-mochawesome-reporter/register';
+
 // Import commands
 import './commands/customer-commands';
 import './commands/product-commands';
