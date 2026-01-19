@@ -11,7 +11,8 @@
       "Bash(npx cypress verify)",
       "Bash(npx cypress:*)",
       "Bash(git checkout:*)",
-      "Bash(git merge:*)"
+      "Bash(git merge:*)",
+      "Bash(npm test:*)"
     ]
   }
 }
