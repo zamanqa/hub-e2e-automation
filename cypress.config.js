@@ -19,7 +19,7 @@ module.exports = defineConfig({
   },
 
   e2e: {
-    baseUrl: 'https://hub.development.circuly.io/en/auth/login',
+    baseUrl: process.env.BASE_URL || 'https://hub.development.circuly.io/',
     viewportWidth: 1920,
     viewportHeight: 1080,
     video: true,
@@ -32,6 +32,14 @@ module.exports = defineConfig({
     specPattern: 'cypress/e2e/**/*.cy.js',
 
     env: {
+      // Login credentials
+      loginUrl: process.env.LOGIN_URL || 'https://hub.development.circuly.io/en/auth/login',
+      testUserEmail: process.env.TEST_USER_EMAIL || 'super.admin@circuly.io',
+      testUserPassword: process.env.TEST_USER_PASSWORD || 'Pa$$word131152489',
+
+      // Company IDs
+      circuly_shopify_stripe: process.env.circuly_shopify_stripe || 'circuly shopify stripe',
+
       // Checkout URL (from your previous project)
       url: 'https://circuly-checkout-development.herokuapp.com/en/',
 

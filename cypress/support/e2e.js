@@ -2,9 +2,7 @@
 import 'cypress-mochawesome-reporter/register';
 
 // Import commands
-import './commands/customer-commands';
-import './commands/product-commands';
-import './commands/order-commands';
+import './commands/auth-commands';
 import './commands/database-commands';
 
 // Global configuration
@@ -13,9 +11,4 @@ Cypress.on('uncaught:exception', (err, runnable) => {
   return false;
 });
 
-// Before each test
-beforeEach(() => {
-  // Clear cookies and local storage
-  cy.clearCookies();
-  cy.clearLocalStorage();
-});
+// Removed beforeEach that clears cookies/storage to preserve session

@@ -4,16 +4,14 @@
   "description": "Cypress E2E automation for HUB application - Shopify platform",
   "main": "index.js",
   "scripts": {
-    "cy:open": "node_modules\\.bin\\cypress open",
+    "open": "node_modules\\.bin\\cypress open",
     "cy:run": "dotenv -e .env -- cypress run --record",
     "cy:run:chrome": "dotenv -e .env -- cypress run --browser chrome --record",
     "cy:health-check": "dotenv -e .env -- cypress run --config-file cypress.health-check.config.js --record",
-    "cy:run:customers": "dotenv -e .env -- cypress run --spec 'cypress/e2e/01-customers/**/*.cy.js' --record",
-    "cy:run:products": "dotenv -e .env -- cypress run --spec 'cypress/e2e/02-products/**/*.cy.js' --record",
-    "cy:run:orders": "dotenv -e .env -- cypress run --spec 'cypress/e2e/03-orders/**/*.cy.js' --record",
-    "allHubTestHead": "dotenv -e .env -- npx cypress run --record --browser chrome --headed --spec 'cypress/e2e/**/*.cy.js' --record",
-    "allHubTestHeadless": "dotenv -e .env -- npx cypress run --record --browser chrome --headless --spec 'cypress/e2e/**/*.cy.js' --record",
-    "test": "npm run cy:health-check"
+    "allHubTestHead": "dotenv -e .env -- npx cypress run --record --browser chrome --headed --spec 'cypress/e2e/**/*.cy.js'",
+    "allHubTestHeadless": "dotenv -e .env -- npx cypress run --record --browser chrome --headless --spec 'cypress/e2e/**/*.cy.js'",
+    "test": "npm run cy:health-check",
+    "oneCase": "dotenv -e .env -- cypress run --spec 'cypress/e2e/00-login-hub/**/*.cy.js' --record"
   },
   "keywords": [
     "cypress",
