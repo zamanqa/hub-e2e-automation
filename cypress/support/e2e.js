@@ -11,4 +11,10 @@ Cypress.on('uncaught:exception', (err, runnable) => {
   return false;
 });
 
-// Removed beforeEach that clears cookies/storage to preserve session
+// Global beforeEach hook - runs before every test
+beforeEach(() => {
+  // Login before each test to maintain session
+  cy.login();
+});
+
+// Removed standalone beforeEach that clears cookies/storage to preserve session

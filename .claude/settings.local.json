@@ -15,7 +15,8 @@
       "Bash(npm test:*)",
       "Bash(npm install:*)",
       "Bash(npm run cy:health-check:*)",
-      "Bash(export CYPRESS_RECORD_KEY=6392946b-2a56-4996-8ab1-987cc71c67bd)"
+      "Bash(export CYPRESS_RECORD_KEY=6392946b-2a56-4996-8ab1-987cc71c67bd)",
+      "Bash(git push:*)"
     ]
   }
 }
