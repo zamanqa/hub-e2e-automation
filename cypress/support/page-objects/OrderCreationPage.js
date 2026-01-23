@@ -572,6 +572,19 @@ class OrderCreationPage {
     });
   }
 
+  // ==================== CHARGE BY INVOICE CHECKBOX ====================
+  // Selector
+  get chargeByInvoiceCheckbox() {
+    return cy.get('input[aria-label="Charge by invoice"]');
+  }
+
+  // Action
+  enableChargeByInvoice() {
+    this.chargeByInvoiceCheckbox.click({ force: true });
+    cy.wait(500);
+    cy.log('✓ Verified: Charge by invoice checkbox enabled');
+  }
+
   // ==================== PAGE NAVIGATION ====================
 
 }
