@@ -11,7 +11,7 @@
     "allHubTestHead": "dotenv -e .env -- npx cypress run --record --browser chrome --headed --spec 'cypress/e2e/**/*.cy.js'",
     "allHubTestHeadless": "dotenv -e .env -- npx cypress run --record --browser chrome --headless --spec 'cypress/e2e/**/*.cy.js'",
     "test": "npm run cy:health-check",
-    "oneCase": "dotenv -e .env -- cypress run --spec 'cypress/e2e/00-login-hub/**/*.cy.js' --record"
+    "oneCase": "dotenv -e .env -- cypress run --spec 'cypress/e2e/01-order-page/**/*.cy.js' --record"
   },
   "keywords": [
     "cypress",

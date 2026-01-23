@@ -1,0 +1,24 @@
+{
+  "billingAddress": {
+    "givenName": "Shahiduz",
+    "surname": "Zaman",
+    "email": "test.user.{{timestamp}}@circuly.io",
+    "phone": "+4917656824720",
+    "vatNumber": "159753",
+    "company": "Test Company",
+    "street": "WeberStr.",
+    "streetNumber": "25",
+    "postalCode": "60318",
+    "city": "Frankfurt am Main",
+    "country": "Germany"
+  },
+  "shippingAddress": {
+    "givenName": "Shahiduz",
+    "surname": "Zaman",
+    "street": "WeberStr.",
+    "streetNumber": "25",
+    "postalCode": "60318",
+    "city": "Frankfurt am Main",
+    "country": "Germany"
+  }
+}

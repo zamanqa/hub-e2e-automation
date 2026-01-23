@@ -10,5 +10,6 @@ Cypress.Commands.add('login', () => {
     LoginPage.verifyLoginSuccess();
     LoginPage.selectCompany(Cypress.env('circuly_shopify_stripe'));
     LoginPage.verifyCompanySelection();
+    cy.wait (5000)
   });
 });
