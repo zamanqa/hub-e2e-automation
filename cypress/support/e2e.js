@@ -4,6 +4,7 @@ import 'cypress-mochawesome-reporter/register';
 // Import commands
 import './commands/auth-commands';
 import './commands/database-commands';
+import './commands/api-commands';
 
 // Global configuration
 Cypress.on('uncaught:exception', (err, runnable) => {
