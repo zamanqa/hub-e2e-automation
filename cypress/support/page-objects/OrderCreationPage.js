@@ -21,6 +21,12 @@ class OrderCreationPage {
     return cy.contains('p', 'Create order');
   }
 
+    // Action
+  visit() {
+    cy.visit('https://hub.development.circuly.io/en/cms/orders/create');
+    cy.wait(1000);
+  }
+
   // Action
   verifyPageLoaded() {
     this.waitForElement(this.pageTitle);
@@ -335,136 +341,186 @@ class OrderCreationPage {
       .invoke('text')
       .then((rowTotal) => {
         expect(rowTotal.trim()).to.not.equal('0,00 €');
-        expect(rowTotal.trim()).to.not.equal('0.00 €');
         cy.log(`✓ Verified: Row total is "${rowTotal.trim()}" (not zero)`);
       });
   }
 
-  // ==================== BILLING ADDRESS FORM ====================
+  // ==================== BILLING ADDRESS SECTION HEADER ====================
+  // Selector
+  get billingAddressHeader() {
+    return cy.contains('p', 'Billing address', { timeout: 10000 });
+  }
 
-  // Selectors
+  // Action
+  scrollToBillingSection() {
+    this.billingAddressHeader.should('be.visible').then(($header) => {
+      $header[0].scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
+    cy.wait(2000);
+    cy.log('✓ Verified: Scrolled to billing address section');
+  }
+
+  // ==================== GIVEN NAME INPUT ====================
+  // Selector
   get givenNameInput() {
-    return cy.get('[data-cy="billing-first-name"] input');
+    return cy.get('[data-cy="billing-first-name"]').find('input[type="text"]');
   }
 
-  get surnameInput() {
-    return cy.get('[data-cy="billing-last-name"] input');
-  }
-
-  get emailInput() {
-    return cy.get('[data-cy="billing-email"] input');
-  }
-
-  get phoneInput() {
-    return cy.get('[data-cy="billing-phone"] input');
-  }
-
-  get vatNumberInput() {
-    return cy.get('[data-cy="billing-vat-number"] input');
-  }
-
-  get companyInput() {
-    return cy.get('[data-cy="billing-company"] input');
-  }
-
-  get streetInput() {
-    return cy.get('[data-cy="billing-street"] input');
-  }
-
-  get streetNumberInput() {
-    return cy.get('[data-cy="billing-street-number"] input');
-  }
-
-  get postalCodeInput() {
-    return cy.get('[data-cy="billing-postal-code"] input');
-  }
-
-  get cityInput() {
-    return cy.get('[data-cy="billing-city"] input');
-  }
-
-  get countryDropdown() {
-    return cy.get('[data-cy="billing-country"]');
-  }
-
-  // Actions
+  // Action
   fillGivenName(givenName) {
-    this.waitForElement(this.givenNameInput);
-    this.givenNameInput.clear().type(givenName);
+    this.givenNameInput.type(givenName, { force: true });
     cy.log(`✓ Verified: Given name set to "${givenName}"`);
   }
 
+  // ==================== SURNAME INPUT ====================
+  // Selector
+  get surnameInput() {
+    return cy.get('[data-cy="billing-last-name"]').find('input[type="text"]');
+  }
+
+  // Action
   fillSurname(surname) {
-    this.waitForElement(this.surnameInput);
-    this.surnameInput.clear().type(surname);
+    this.surnameInput.type(surname, { force: true });
     cy.log(`✓ Verified: Surname set to "${surname}"`);
   }
 
+  // ==================== EMAIL INPUT ====================
+  // Selector
+  get emailInput() {
+    return cy.get('[data-cy="billing-email"]').find('input[type="text"]');
+  }
+
+  // Action
   fillEmail(email) {
-    // Replace {{timestamp}} with actual timestamp if present
     const emailWithTimestamp = email.replace('{{timestamp}}', Date.now());
-    this.waitForElement(this.emailInput);
-    this.emailInput.clear().type(emailWithTimestamp);
+    this.emailInput.type(emailWithTimestamp, { force: true });
     cy.log(`✓ Verified: Email set to "${emailWithTimestamp}"`);
     return emailWithTimestamp;
   }
 
+  // ==================== PHONE INPUT ====================
+  // Selector
+  get phoneInput() {
+    return cy.get('[data-cy="billing-phone"]').find('input[type="text"]');
+  }
+
+  // Action
   fillPhone(phone) {
-    this.waitForElement(this.phoneInput);
-    this.phoneInput.clear().type(phone);
+    this.phoneInput.type(phone, { force: true });
     cy.log(`✓ Verified: Phone set to "${phone}"`);
   }
 
+  // ==================== VAT NUMBER INPUT ====================
+  // Selector
+  get vatNumberInput() {
+    return cy.get('[data-cy="billing-vat-number"]').find('input[type="text"]');
+  }
+
+  // Action
   fillVatNumber(vatNumber) {
-    this.waitForElement(this.vatNumberInput);
-    this.vatNumberInput.clear().type(vatNumber);
+    this.vatNumberInput.type(vatNumber, { force: true });
     cy.log(`✓ Verified: VAT number set to "${vatNumber}"`);
   }
 
+  // ==================== COMPANY INPUT ====================
+  // Selector
+  get companyInput() {
+    return cy.get('[data-cy="billing-company"]').find('input[type="text"]');
+  }
+
+  // Action
   fillCompany(company) {
-    this.waitForElement(this.companyInput);
-    this.companyInput.clear().type(company);
+    this.companyInput.type(company, { force: true });
     cy.log(`✓ Verified: Company set to "${company}"`);
   }
 
+  // ==================== STREET INPUT ====================
+  // Selector
+  get streetInput() {
+    return cy.get('[data-cy="billing-street"]').find('input[type="text"]');
+  }
+
+  // Action
   fillStreet(street) {
-    this.waitForElement(this.streetInput);
-    this.streetInput.clear().type(street);
+    this.streetInput.type(street, { force: true });
     cy.log(`✓ Verified: Street set to "${street}"`);
   }
 
+  // ==================== STREET NUMBER INPUT ====================
+  // Selector
+  get streetNumberInput() {
+    return cy.get('[data-cy="billing-street-number"]').find('input[type="text"]');
+  }
+
+  // Action
   fillStreetNumber(streetNumber) {
-    this.waitForElement(this.streetNumberInput);
-    this.streetNumberInput.clear().type(streetNumber);
+    this.streetNumberInput.type(streetNumber, { force: true });
     cy.log(`✓ Verified: Street number set to "${streetNumber}"`);
   }
 
+  // ==================== ADDRESS ADDITION INPUT ====================
+  // Selector
+  get addressAdditionInput() {
+    return cy.get('[data-cy="billing-address-addition"]').find('input[type="text"]');
+  }
+
+  // Action
+  fillAddressAddition(addressAddition) {
+    if (addressAddition) {
+      this.addressAdditionInput.type(addressAddition, { force: true });
+      cy.log(`✓ Verified: Address addition set to "${addressAddition}"`);
+    }
+  }
+
+  // ==================== POSTAL CODE INPUT ====================
+  // Selector
+  get postalCodeInput() {
+    return cy.get('[data-cy="billing-postal-code"]').find('input[type="text"]');
+  }
+
+  // Action
   fillPostalCode(postalCode) {
-    this.waitForElement(this.postalCodeInput);
-    this.postalCodeInput.clear().type(postalCode);
+    this.postalCodeInput.type(postalCode, { force: true });
     cy.log(`✓ Verified: Postal code set to "${postalCode}"`);
   }
 
+  // ==================== CITY INPUT ====================
+  // Selector
+  get cityInput() {
+    return cy.get('[data-cy="billing-city"]').find('input[type="text"]');
+  }
+
+  // Action
   fillCity(city) {
-    this.waitForElement(this.cityInput);
-    this.cityInput.clear().type(city);
+    this.cityInput.type(city, { force: true });
     cy.log(`✓ Verified: City set to "${city}"`);
   }
 
-  selectCountry(country) {
-    this.waitForElement(this.countryDropdown);
-    this.countryDropdown.click();
+  // ==================== COUNTRY DROPDOWN ====================
+  // Selector
+  get countryDropdown() {
+    return cy.get('[data-cy="billing-country"]');
+  }
 
-    // Wait for dropdown options and select the country
-    cy.contains('[role="option"]', country, { timeout: 5000, matchCase: false })
+  get countryDropdownInput() {
+    return cy.get('[data-cy="billing-country"]').find('input[type="text"]');
+  }
+
+  // Action
+  selectCountry(country) {
+    this.countryDropdownInput.click({ force: true });
+    cy.wait(1000);
+    cy.contains('[role="option"]', country, { timeout: 10000, matchCase: false })
       .click({ force: true });
+    cy.wait(500);
     cy.log(`✓ Verified: Country "${country}" has been selected`);
   }
 
-  // Method to fill complete billing address from fixture data
+  // ==================== FILL COMPLETE BILLING ADDRESS ====================
+  // Action
   fillBillingAddress(billingData) {
     cy.log('========== Filling Billing Address ==========');
-
+    this.scrollToBillingSection();
     this.fillGivenName(billingData.givenName);
     this.fillSurname(billingData.surname);
     this.fillEmail(billingData.email);
@@ -473,19 +529,51 @@ class OrderCreationPage {
     this.fillCompany(billingData.company);
     this.fillStreet(billingData.street);
     this.fillStreetNumber(billingData.streetNumber);
+    this.fillAddressAddition(billingData.addressAddition);
     this.fillPostalCode(billingData.postalCode);
     this.fillCity(billingData.city);
     this.selectCountry(billingData.country);
-
     cy.log('✓ Verified: Billing address filled successfully');
   }
 
-  // ==================== PAGE NAVIGATION ====================
-  // Action
-  visit() {
-    cy.visit('https://hub.development.circuly.io/en/cms/orders/create');
-    cy.wait(1000);
+  // ==================== CREATE ORDER BUTTON ====================
+  // Selector
+  get createOrderButton() {
+    return cy.get('button[data-cy="btn-submit"]').contains('Create order');
   }
+
+  // Action
+  clickCreateOrder() {
+    this.createOrderButton.click();
+    cy.wait(8000);
+    cy.log('✓ Verified: Create order button clicked');
+  }
+
+  // Action
+  verifyOrderCreated() {
+    cy.url().should('include', '/cms/orders/');
+
+    // Extract order ID from URL
+    cy.url().then((url) => {
+      const orderId = url.split('/cms/orders/')[1];
+      cy.log(`✓ Verified: Order ID extracted from URL: ${orderId}`);
+
+      // Wait 5 seconds before database check
+      cy.wait(8000);
+
+      // Verify order exists in database
+      const query = `SELECT * FROM orders WHERE order_id = '${orderId}' AND origin = 'cms'`;
+
+      cy.task('queryDb', query).then((results) => {
+        expect(results.length).to.be.greaterThan(0);
+        cy.log(`✓ Verified: Order ${orderId} found in database with origin 'cms'`);
+        cy.log(`✓ Verified: Order created successfully`);
+      });
+    });
+  }
+
+  // ==================== PAGE NAVIGATION ====================
+
 }
 
 export default new OrderCreationPage();

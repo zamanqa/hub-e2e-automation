@@ -8,6 +8,7 @@
     "company": "Test Company",
     "street": "WeberStr.",
     "streetNumber": "25",
+    "addressAddition": "",
     "postalCode": "60318",
     "city": "Frankfurt am Main",
     "country": "Germany"

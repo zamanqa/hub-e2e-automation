@@ -8,6 +8,9 @@ describe('Order Creation - Add Items with Different Subscription Types', () => {
     cy.fixture('testData').then((data) => {
       testData = data;
     });
+
+    // Verify all APIs are accessible
+    cy.checkApiHealth();
   });
 
   it('should create an order with three subscription items (service, consumable, digital)', () => {
@@ -63,7 +66,7 @@ describe('Order Creation - Add Items with Different Subscription Types', () => {
 
     // Step 17: Click "Add item" button to submit
     OrderCreationPage.submitItem();
-
+    
     // ========== SECOND ITEM: CONSUMABLE TYPE ==========
     cy.log('========== Adding Item 2: CONSUMABLE TYPE ==========');
 
@@ -166,6 +169,11 @@ describe('Order Creation - Add Items with Different Subscription Types', () => {
 
     // ========== FILL BILLING ADDRESS ==========
     OrderCreationPage.fillBillingAddress(testData.billingAddress);
+
+    // ========== CREATE ORDER ==========
+    cy.log('========== Creating Order ==========');
+    OrderCreationPage.clickCreateOrder();
+    OrderCreationPage.verifyOrderCreated();
 
   });
 });
