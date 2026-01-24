@@ -32,15 +32,15 @@ class OrderCreationPage {
 
     // ==================== QUOTE ORDER NAVIGATION BUTTON ====================
   // Selector
-  get createOrderNavigationButton() {
+  get quoteOrderNavigationButton() {
     return cy.contains('button', 'Create quote');
   }
 
   // Action
-  clickCreateOrderButton() {
+  clickQuoteOrderButton() {
     cy.visit(Cypress.env('baseUrl'));
     cy.wait(10000);
-    this.createOrderNavigationButton.click();
+    this.quoteOrderNavigationButton.click();
     cy.wait(3000);
     cy.log('✓ Verified: Clicked Create order button to open order creation page');
   }
@@ -59,13 +59,13 @@ class OrderCreationPage {
 
     // ==================== QUOTE ORDER PAGE TITLE ====================
   // Selector
-  get pageTitle() {
+  get quotePageTitle() {
     return cy.contains('p', 'Create quote');
   }
 
   // Action
   verifyQuoteOrderPageLoaded() {
-    this.waitForElement(this.pageTitle);
+    this.waitForElement(this.quotePageTitle);
     cy.log('✓ Verified: Order creation page loaded');
   }
 
@@ -623,13 +623,13 @@ class OrderCreationPage {
 
    // ==================== CREATE QUOTE SUBMIT BUTTON ====================
   // Selector
-  get createOrderSubmitButton() {
+  get quoteOrderSubmitButton() {
     return cy.get('button[data-cy="btn-submit"]').contains('Create quote');
   }
 
   // Action
   clickQuoteOrder() {
-    this.createOrderSubmitButton.click();
+    this.quoteOrderSubmitButton.click();
     cy.wait(8000);
     cy.log('✓ Verified: Create order submit button clicked');
   }

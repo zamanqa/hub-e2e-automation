@@ -15,7 +15,7 @@ describe('Order Creation - Add Items with Different Subscription Types', () => {
 
   it('should create an order with three subscription items (service, consumable, digital)', () => {
     // Step 1: Click Create order button and verify page loaded
-    OrderCreationPage.clickCreateOrderButton();
+    OrderCreationPage.clickQuoteOrderButton();
     OrderCreationPage.verifyQuoteOrderPageLoaded();
 
     // ========== FIRST ITEM: SERVICE TYPE ==========
