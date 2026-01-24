@@ -32,8 +32,11 @@ module.exports = defineConfig({
     specPattern: 'cypress/e2e/**/*.cy.js',
 
     env: {
-      // Login credentials
+      // Application URLs
+      baseUrl: process.env.BASE_URL || 'https://hub.development.circuly.io/',
       loginUrl: process.env.LOGIN_URL || 'https://hub.development.circuly.io/en/auth/login',
+
+      // Login credentials
       testUserEmail: process.env.TEST_USER_EMAIL || 'super.admin@circuly.io',
       testUserPassword: process.env.TEST_USER_PASSWORD || 'Pa$$word131152489',
 

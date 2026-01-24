@@ -15,20 +15,56 @@ class OrderCreationPage {
     return element.should('be.visible', { timeout: maxWait });
   }
 
-  // ==================== PAGE TITLE ====================
+  // ==================== CREATE ORDER NAVIGATION BUTTON ====================
+  // Selector
+  get createOrderNavigationButton() {
+    return cy.contains('button', 'Create order');
+  }
+
+  // Action
+  clickCreateOrderButton() {
+    cy.visit(Cypress.env('baseUrl'));
+    cy.wait(10000);
+    this.createOrderNavigationButton.click();
+    cy.wait(3000);
+    cy.log('✓ Verified: Clicked Create order button to open order creation page');
+  }
+
+    // ==================== QUOTE ORDER NAVIGATION BUTTON ====================
+  // Selector
+  get createOrderNavigationButton() {
+    return cy.contains('button', 'Create quote');
+  }
+
+  // Action
+  clickCreateOrderButton() {
+    cy.visit(Cypress.env('baseUrl'));
+    cy.wait(10000);
+    this.createOrderNavigationButton.click();
+    cy.wait(3000);
+    cy.log('✓ Verified: Clicked Create order button to open order creation page');
+  }
+
+  // ==================== CREATE ORDER PAGE TITLE ====================
   // Selector
   get pageTitle() {
     return cy.contains('p', 'Create order');
   }
 
-    // Action
-  visit() {
-    cy.visit('https://hub.development.circuly.io/en/cms/orders/create');
-    cy.wait(1000);
+  // Action
+  verifyPageLoaded() {
+    this.waitForElement(this.pageTitle);
+    cy.log('✓ Verified: Order creation page loaded');
+  }
+
+    // ==================== QUOTE ORDER PAGE TITLE ====================
+  // Selector
+  get pageTitle() {
+    return cy.contains('p', 'Create quote');
   }
 
   // Action
-  verifyPageLoaded() {
+  verifyQuoteOrderPageLoaded() {
     this.waitForElement(this.pageTitle);
     cy.log('✓ Verified: Order creation page loaded');
   }
@@ -536,17 +572,30 @@ class OrderCreationPage {
     cy.log('✓ Verified: Billing address filled successfully');
   }
 
-  // ==================== CREATE ORDER BUTTON ====================
+  // ==================== CHARGE BY INVOICE CHECKBOX ====================
   // Selector
-  get createOrderButton() {
+  get chargeByInvoiceCheckbox() {
+    return cy.get('input[aria-label="Charge by invoice"]');
+  }
+
+  // Action
+  enableChargeByInvoice() {
+    this.chargeByInvoiceCheckbox.click({ force: true });
+    cy.wait(500);
+    cy.log('✓ Verified: Charge by invoice checkbox enabled');
+  }
+
+ // ==================== CREATE ORDER SUBMIT BUTTON ====================
+  // Selector
+  get createOrderSubmitButton() {
     return cy.get('button[data-cy="btn-submit"]').contains('Create order');
   }
 
   // Action
   clickCreateOrder() {
-    this.createOrderButton.click();
+    this.createOrderSubmitButton.click();
     cy.wait(8000);
-    cy.log('✓ Verified: Create order button clicked');
+    cy.log('✓ Verified: Create order submit button clicked');
   }
 
   // Action
@@ -572,18 +621,55 @@ class OrderCreationPage {
     });
   }
 
-  // ==================== CHARGE BY INVOICE CHECKBOX ====================
+   // ==================== CREATE QUOTE SUBMIT BUTTON ====================
   // Selector
-  get chargeByInvoiceCheckbox() {
-    return cy.get('input[aria-label="Charge by invoice"]');
+  get createOrderSubmitButton() {
+    return cy.get('button[data-cy="btn-submit"]').contains('Create quote');
   }
 
   // Action
-  enableChargeByInvoice() {
-    this.chargeByInvoiceCheckbox.click({ force: true });
-    cy.wait(500);
-    cy.log('✓ Verified: Charge by invoice checkbox enabled');
+  clickQuoteOrder() {
+    this.createOrderSubmitButton.click();
+    cy.wait(8000);
+    cy.log('✓ Verified: Create order submit button clicked');
   }
+
+  // Action
+  verifyQuoteOrderCreated() {
+    cy.url().should('include', '/cms/orders/');
+
+    // Extract order ID from URL
+    cy.url().then((url) => {
+      const orderId = url.split('/cms/orders/drafts/')[1];
+      cy.log(`✓ Verified: Order ID extracted from URL: ${orderId}`);
+
+      // Wait 8 seconds before database check
+      cy.wait(8000);
+
+      // Verify order exists in database and get checkout link
+      const query = `SELECT id, draft_id, order_checkout_link, status FROM public.draft_orders WHERE draft_id = '${orderId}'`;
+
+      cy.task('queryDb', query).then((results) => {
+        expect(results.length).to.be.greaterThan(0);
+        cy.log(`✓ Verified: Draft order ${orderId} found in database`);
+
+        // Get the checkout link from the result
+        const checkoutLink = results[0].order_checkout_link;
+        cy.log(`✓ Verified: Checkout link found: ${checkoutLink}`);
+
+        // Visit the checkout link to verify it works
+        cy.visit(checkoutLink);
+        cy.wait(3000);
+        cy.log(`✓ Verified: Checkout link is working`);
+
+        // Close the page by going back
+        cy.go('back');
+        cy.wait(2000);
+        cy.log(`✓ Verified: Draft order created successfully`);
+      });
+    });
+  }
+
 
   // ==================== PAGE NAVIGATION ====================
 
