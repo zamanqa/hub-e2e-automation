@@ -23,7 +23,9 @@ This guide documents the established patterns and best practices for writing Cyp
 
 ### Class-based Singleton Pattern
 
-All page objects follow this structure:
+All page objects follow this structure with **selector-action pairing**:
+
+**IMPORTANT**: Each selector should be immediately followed by its related action(s). This makes the code easier to read and maintain.
 
 ```javascript
 /**
@@ -45,6 +47,17 @@ class PageName {
     this.elementName.click();
     cy.wait(2000);
     cy.log('✓ Verified: Action completed');
+  }
+
+  // Selector (another element)
+  get anotherElement() {
+    return cy.get('another-selector');
+  }
+
+  // Action (for anotherElement)
+  anotherMethod() {
+    this.anotherElement.type('text');
+    cy.log('✓ Verified: Another action completed');
   }
 
   // ==================== HELPER METHODS ====================
