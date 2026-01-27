@@ -64,8 +64,9 @@ class OrderQueries {
         AND o.payment_provider = 'stripe'
         AND o.payment_method_token = 'visa'
         AND o.status = 'open'
+        AND o.origin = 'checkout'
       ORDER BY o.created_at DESC
-      LIMIT 1 OFFSET 4
+      LIMIT 1 OFFSET 1
     `;
   }
 
