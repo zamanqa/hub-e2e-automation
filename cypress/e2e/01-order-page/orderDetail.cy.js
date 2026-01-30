@@ -146,33 +146,35 @@ describe('Order Detail Page - Comprehensive Tests', () => {
                   // Execute subscription creation flow
                   OrderDetailPage.createSubscriptionFlow();
 
-                  // Get the subscription ID after creation
-                  cy.wrap(row).find('td').eq(5).invoke('text').then((subId) => {
-                    const subscriptionId = subId.trim();
+                  // Get the subscription ID after creation from hyperlink
+                  cy.wrap(row).find('td').eq(0).find('a[href*="/subscriptions/"]').invoke('attr', 'href').then((href) => {
+                    const subscriptionId = href.split('/subscriptions/')[1];
                     cy.log(`Created subscription with ID: ${subscriptionId}`);
 
                     // Database Verification
                     cy.log(`--- Database Verification for ${subscriptionId} ---`);
 
-                    // Verify subscription exists in database
+                    // Verify subscription exists in database and get the id
                     cy.task('queryDb', SubscriptionQueries.getSubscriptionById(subscriptionId)).then((subscriptions) => {
                       if (subscriptions && subscriptions.length > 0) {
                         cy.log(`✓ Verified: Subscription ${subscriptionId} exists in database`);
                         const sub = subscriptions[0];
+                        const dbSubscriptionId = sub.id; // This is the id from subscriptions table
+                        cy.log(`  - DB ID: ${dbSubscriptionId}`);
                         cy.log(`  - Order ID: ${sub.order_id}`);
                         cy.log(`  - Status: ${sub.subscription_status}`);
                         cy.log(`  - Type: ${sub.subscription_type}`);
+
+                        // Check recurring payments using the id from subscriptions table
+                        cy.task('queryDb', SubscriptionQueries.hasRecurringPayments(dbSubscriptionId)).then((recurringPayments) => {
+                          if (recurringPayments && recurringPayments.length > 0) {
+                            cy.log(`✓ Verified: Subscription has recurring payments enabled`);
+                          } else {
+                            cy.log(`⚠ Info: Subscription does not have recurring payments enabled yet`);
+                          }
+                        });
                       } else {
                         cy.log(`⚠ Warning: Subscription ${subscriptionId} not found in database`);
-                      }
-                    });
-
-                    // Check recurring payments
-                    cy.task('queryDb', SubscriptionQueries.hasRecurringPayments(subscriptionId)).then((recurringPayments) => {
-                      if (recurringPayments && recurringPayments.length > 0) {
-                        cy.log(`✓ Verified: Subscription ${subscriptionId} has recurring payments enabled`);
-                      } else {
-                        cy.log(`⚠ Info: Subscription ${subscriptionId} does not have recurring payments enabled yet`);
                       }
                     });
                   });

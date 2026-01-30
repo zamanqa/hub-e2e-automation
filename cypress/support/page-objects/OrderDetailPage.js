@@ -102,7 +102,7 @@ enterNoteMessage(message) {
     cy.wait(1000);
     cy.log('✓ Verified: Clicked Generate button');
   }
-
+/*
   // Selector
   get addButton() {
     return cy.contains('button', 'Add');
@@ -115,10 +115,10 @@ enterNoteMessage(message) {
     cy.wait(1000);
     cy.log('✓ Verified: Clicked Add button');
   }
-
+*/
   // Selector
   get submitButton() {
-    return cy.get('button[data-cy="btn-submit"]');
+    return cy.contains('span', 'Submit');
   }
 
   // Action
@@ -165,7 +165,7 @@ enterNoteMessage(message) {
     this.clickGenerate();
 
     // Click Add
-    this.clickAdd();
+    //this.clickAdd();
 
     // Click Submit
     this.clickSubmit();
