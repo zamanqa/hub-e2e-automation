@@ -20,24 +20,52 @@
 
 ```
 hub-e2e-automation/
+├── .claude-memory/              # Claude-specific documentation
+│   ├── claude-memory.md         # This file - Project knowledge base
+│   ├── claude-instructions.md   # Token optimization rules
+│   ├── session-history.md       # Recent session tracking
+│   ├── session-starter.md       # Quick start guide
+│   └── CLAUDE-CODE-GUIDE.md     # How to use Claude with this project
 ├── cypress/
-│   ├── e2e/
+│   ├── e2e/                     # Test files organized by module
 │   │   └── 01-order-page/
 │   │       ├── orderList.cy.js
-│   │       └── orderDetail.cy.js
+│   │       ├── orderDetail.cy.js
+│   │       └── createManualOrder.cy.js
 │   ├── support/
-│   │   ├── page-objects/
+│   │   ├── page-objects/        # Page Object Models
 │   │   │   ├── OrderListPage.js
-│   │   │   └── OrderDetailPage.js
-│   │   └── helpers/
-│   │       ├── order-queries.js
-│   │       └── subscription-queries.js
+│   │   │   ├── OrderDetailPage.js
+│   │   │   └── OrderCreationPage.js
+│   │   ├── helpers/             # Database query helpers
+│   │   │   ├── order-queries.js
+│   │   │   ├── subscription-queries.js
+│   │   │   └── api-health-check.js
+│   │   ├── commands/            # Custom Cypress commands
+│   │   │   ├── auth-commands.js
+│   │   │   ├── database-commands.js
+│   │   │   └── api-commands.js
+│   │   └── database/
+│   │       └── db-helper.js
 │   └── fixtures/
 │       └── testData.json
-└── docs/
-    ├── test-writing-guide.md
-    └── claude-memory.md (this file)
+├── docs/                        # Technical documentation
+│   ├── test-writing-guide.md    # Comprehensive test patterns
+│   ├── API-HEALTH-CHECK-SETUP.md
+│   ├── BILLING-ADDRESS-UPDATE.md
+│   ├── CONFIGURATION-CHANGES.md
+│   ├── CUSTOM-COMMANDS-GUIDE.md
+│   ├── SET-ENV.md
+│   └── SETUP.md
+└── README.md
 ```
+
+**File Organization Rules:**
+- `.claude-memory/` - All Claude-specific guides and memory
+- `docs/` - Technical setup and configuration documentation
+- `cypress/support/helpers/` - Database queries and API helpers
+- `cypress/support/commands/` - Custom Cypress commands
+- `cypress/support/page-objects/` - Page Object Models
 
 ---
 
