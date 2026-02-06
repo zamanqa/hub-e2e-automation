@@ -2,6 +2,7 @@ node_modules/
 cypress/videos/
 cypress/screenshots/
 cypress/downloads/
+cypress/e2e/chargebacks/
 reports/
 screenshots/
 videos/
