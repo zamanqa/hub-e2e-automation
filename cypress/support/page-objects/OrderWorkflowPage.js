@@ -41,9 +41,9 @@ class OrderWorkflowPage {
     cy.log('✓ Verified: Clicked One-time payment option');
   }
 
-  // Selector - One-time payment modal title input
+  // Selector - One-time payment modal title input (data-cy is on the wrapper div, target inner input)
   get oneTimePaymentTitleInput() {
-    return cy.get('[data-cy="product-title"]');
+    return cy.get('[data-cy="product-title"] input');
   }
 
   // Action - Enter one-time payment title
@@ -53,9 +53,9 @@ class OrderWorkflowPage {
     cy.log(`✓ Verified: Entered title: ${title}`);
   }
 
-  // Selector - One-time payment price input
+  // Selector - One-time payment price input (data-cy is on the wrapper div, target inner input)
   get oneTimePaymentPriceInput() {
-    return cy.get('[data-cy="product-price"]');
+    return cy.get('[data-cy="product-price"] input');
   }
 
   // Action - Enter one-time payment price
@@ -65,9 +65,9 @@ class OrderWorkflowPage {
     cy.log(`✓ Verified: Entered price: ${price}`);
   }
 
-  // Selector - VAT input
+  // Selector - VAT input (data-cy is on the wrapper div, target inner input)
   get vatInput() {
-    return cy.get('[data-cy="product-percentage"]');
+    return cy.get('[data-cy="product-percentage"] input');
   }
 
   // Action - Enter VAT
@@ -77,9 +77,9 @@ class OrderWorkflowPage {
     cy.log(`✓ Verified: Entered VAT: ${vat}`);
   }
 
-  // Selector - Quantity input
+  // Selector - Quantity input (data-cy is on the wrapper div, target inner input)
   get quantityInput() {
-    return cy.get('[data-cy="product-quantity"]');
+    return cy.get('[data-cy="product-quantity"] input');
   }
 
   // Action - Verify quantity defaults to 1
@@ -102,7 +102,8 @@ class OrderWorkflowPage {
     cy.log('✓ Verified: Clicked Add item button');
   }
 
-  // Selector - Message to customer textarea (identified by its label text)
+  // Selector - Message to customer textarea
+  // Vue renders this textarea with opacity:0 (overlaid by a visual editor) - use force:true
   get messageToCustomerInput() {
     return cy.contains('label', 'Message to customer')
       .closest('.v-input, .v-field, div')
@@ -111,8 +112,8 @@ class OrderWorkflowPage {
 
   // Action - Enter message to customer
   enterMessageToCustomer(message) {
-    this.waitForElement(this.messageToCustomerInput, 5000);
-    this.messageToCustomerInput.clear({ force: true }).type(message, { force: true });
+    // textarea has opacity:0 in Vue, use force:true to bypass visibility check
+    this.messageToCustomerInput.should('exist').clear({ force: true }).type(message, { force: true });
     cy.log(`✓ Verified: Entered message: ${message}`);
   }
 
@@ -197,7 +198,7 @@ class OrderWorkflowPage {
     cy.log('✓ Verified: Clicked Charge initial payment option');
   }
 
-  // Selector - Initial payment message textarea (same label pattern as one-time payment)
+  // Selector - Initial payment message textarea (opacity:0 in Vue - use force)
   get initialPaymentMessageInput() {
     return cy.contains('label', 'Message to customer')
       .closest('.v-input, .v-field, div')
@@ -206,8 +207,8 @@ class OrderWorkflowPage {
 
   // Action - Enter initial payment message
   enterInitialPaymentMessage(message) {
-    this.waitForElement(this.initialPaymentMessageInput, 5000);
-    this.initialPaymentMessageInput.clear({ force: true }).type(message, { force: true });
+    // textarea has opacity:0 in Vue, use force:true to bypass visibility check
+    this.initialPaymentMessageInput.should('exist').clear({ force: true }).type(message, { force: true });
     cy.log(`✓ Verified: Entered message: ${message}`);
   }
 
