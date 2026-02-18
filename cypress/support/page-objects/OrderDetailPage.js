@@ -27,27 +27,22 @@ class OrderDetailPage {
     cy.log('✓ Verified: Clicked Create Note button');
   }
 
+  // Selector for the note message textarea (stable class selector)
+  get noteMessageInput() {
+    return cy.get('textarea.v-field__input');
+  }
 
-// Selector for the note message input field using dynamic ID
-get noteMessageInput() {
-  return cy.get('textarea[id^="input-v-"]');
-}
-
-// Action to enter a note message
-enterNoteMessage(message) {
-  // Force the click and type action even if the element is not visible
-  this.noteMessageInput.click({ force: true });  // Force the click action
-  this.noteMessageInput.clear({ force: true });  // Force clearing the input
-  this.noteMessageInput.type(message, { force: true });  // Force typing into the textarea
-
-  // Log the successful action
-  cy.log(`✓ Verified: Entered note message: ${message}`);
-}
-
+  // Action to enter a note message
+  enterNoteMessage(message) {
+    this.noteMessageInput.click({ force: true });
+    this.noteMessageInput.clear({ force: true });
+    this.noteMessageInput.type(message, { force: true });
+    cy.log(`✓ Verified: Entered note message: ${message}`);
+  }
 
   // Selector
   get createNoteSubmitButton() {
-    return cy.get('[data-cy="btn-submit"] > .flex');
+    return cy.get('[data-cy="btn-submit"]');
   }
 
   // Action
@@ -92,7 +87,7 @@ enterNoteMessage(message) {
 
   // Selector
   get generateSerialNumberButton() {
-    return cy.contains('button', 'Generate');
+    return cy.get('[data-cy="btn-serial-number-generate"]');
   }
 
   // Action
@@ -102,10 +97,10 @@ enterNoteMessage(message) {
     cy.wait(1000);
     cy.log('✓ Verified: Clicked Generate button');
   }
-/*
+
   // Selector
   get addButton() {
-    return cy.contains('button', 'Add');
+    return cy.get('[data-cy="btn-serial-number-add"]');
   }
 
   // Action
@@ -115,10 +110,10 @@ enterNoteMessage(message) {
     cy.wait(1000);
     cy.log('✓ Verified: Clicked Add button');
   }
-*/
+
   // Selector
   get submitButton() {
-    return cy.contains('span', 'Submit');
+    return cy.contains('button', 'Submit');
   }
 
   // Action
@@ -144,7 +139,7 @@ enterNoteMessage(message) {
 
   // Selector
   get closeButton() {
-    return cy.get('button[data-cy="btn-close"]');
+    return cy.contains('button', 'Close');
   }
 
   // Action
@@ -156,16 +151,20 @@ enterNoteMessage(message) {
   }
 
   // Action
-  createSubscriptionFlow() {
+  // subscriptionType: 'normal', 'consumable', or 'digital'
+  // Digital subscriptions do NOT have a serial number section — skip Generate & Add
+  createSubscriptionFlow(subscriptionType = 'normal') {
     // Verify creation message
     cy.contains('Create a subscription for the order to start charging recurring payments').should('be.visible');
     cy.log('✓ Verified: Create subscription message is displayed');
 
-    // Click Generate
-    this.clickGenerate();
+    if (subscriptionType !== 'digital') {
+      // Click Generate
+      this.clickGenerate();
 
-    // Click Add
-    //this.clickAdd();
+      // Click Add
+      //this.clickAdd();
+    }
 
     // Click Submit
     this.clickSubmit();

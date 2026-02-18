@@ -6,19 +6,17 @@
 class OrderWorkflowPage {
   // ==================== HELPER METHOD ====================
 
-  /**
-   * Wait for element to be visible
-   */
   waitForElement(element, timeout = 10000) {
     element.should('be.visible', { timeout });
   }
 
   // ==================== THREE-DOT ACTIONS MENU ====================
 
-  // Selector - Three dot menu button (⋮)
+  // Selector - Three dot menu button (⋮) on order detail page header
+  // Uses aria-haspopup="menu" scoped to the page content area (not header nav buttons)
   get actionsMenuButton() {
-  return cy.get('div.text-center > .relative > .flex > .inline-flex');
-}
+    return cy.get('button[aria-haspopup="menu"]').filter(':not(.header-btn)').last();
+  }
 
   // Action - Click actions menu
   clickActionsMenu() {
@@ -32,8 +30,7 @@ class OrderWorkflowPage {
 
   // Selector - One-time payment menu option
   get oneTimePaymentOption() {
-    // TODO: Update selector once DOM is provided
-    return cy.contains('One-time payment'); // Placeholder selector
+    return cy.get('[data-cy="order-action-charge"]');
   }
 
   // Action - Click one-time payment option
@@ -46,8 +43,7 @@ class OrderWorkflowPage {
 
   // Selector - One-time payment modal title input
   get oneTimePaymentTitleInput() {
-    // TODO: Update selector once DOM is provided
-    return cy.get('.rounded-md > [data-cy="product-title"]'); // Placeholder selector
+    return cy.get('[data-cy="product-title"]');
   }
 
   // Action - Enter one-time payment title
@@ -59,8 +55,7 @@ class OrderWorkflowPage {
 
   // Selector - One-time payment price input
   get oneTimePaymentPriceInput() {
-    // TODO: Update selector once DOM is provided
-    return cy.get('.rounded-md > [data-cy= "product-price"]'); // Placeholder selector
+    return cy.get('[data-cy="product-price"]');
   }
 
   // Action - Enter one-time payment price
@@ -72,8 +67,9 @@ class OrderWorkflowPage {
 
   // Selector - VAT input
   get vatInput() {
-  return cy.get('.flex [data-cy="product-percentage"]').first(); // Corrected selector with parent class
-}
+    return cy.get('[data-cy="product-percentage"]');
+  }
+
   // Action - Enter VAT
   enterVAT(vat) {
     this.waitForElement(this.vatInput, 5000);
@@ -83,8 +79,7 @@ class OrderWorkflowPage {
 
   // Selector - Quantity input
   get quantityInput() {
-    // TODO: Update selector once DOM is provided
-    return cy.get('.flex > [data-cy="product-quantity"]'); // Placeholder selector
+    return cy.get('[data-cy="product-quantity"]');
   }
 
   // Action - Verify quantity defaults to 1
@@ -94,10 +89,9 @@ class OrderWorkflowPage {
     cy.log('✓ Verified: Quantity defaults to 1');
   }
 
-  // Selector - Add item button (plus icon)
+  // Selector - Add item button (+ icon)
   get addItemButton() {
-    // TODO: Update selector once DOM is provided
-    return cy.get('[data-cy="btn-product-add"]'); // Placeholder selector
+    return cy.get('[data-cy="btn-product-add"]');
   }
 
   // Action - Click add item button
@@ -108,21 +102,23 @@ class OrderWorkflowPage {
     cy.log('✓ Verified: Clicked Add item button');
   }
 
-  // Selector - Message to customer textarea
+  // Selector - Message to customer textarea (identified by its label text)
   get messageToCustomerInput() {
-  return cy.get('textarea[aria-describedby="input-v-0-3-3-0-2-messages"]'); // Using more specific selector for textarea
-}
+    return cy.contains('label', 'Message to customer')
+      .closest('.v-input, .v-field, div')
+      .find('textarea');
+  }
 
   // Action - Enter message to customer
   enterMessageToCustomer(message) {
-    this.messageToCustomerInput.clear().type(message);
+    this.waitForElement(this.messageToCustomerInput, 5000);
+    this.messageToCustomerInput.clear({ force: true }).type(message, { force: true });
     cy.log(`✓ Verified: Entered message: ${message}`);
   }
 
-  // Selector - Charge button
+  // Selector - Charge / Submit button in modal
   get chargeButton() {
-    // TODO: Update selector once DOM is provided
-    return cy.get('[data-cy="btn-submit"] > .flex'); // Placeholder selector
+    return cy.get('[data-cy="btn-submit"]');
   }
 
   // Action - Click charge button
@@ -135,8 +131,7 @@ class OrderWorkflowPage {
 
   // Selector - Success notification
   get successNotification() {
-    // TODO: Update selector once DOM is provided
-    return cy.get('[data-test-id="message"]'); // Placeholder selector
+    return cy.get('[data-test-id="message"]');
   }
 
   // Action - Verify success notification appears
@@ -146,20 +141,24 @@ class OrderWorkflowPage {
     cy.log('✓ Verified: Success notification displayed');
   }
 
-  // Action - Close success notification
+  // Selector - Close button in modal
+  get closeButton() {
+    return cy.get('[data-cy="btn-close"]');
+  }
+
+  // Action - Close success notification / modal
   closeSuccessNotification() {
-    // TODO: Update selector once DOM is provided
-    cy.contains('button', 'Close').click(); // Placeholder selector
+    this.waitForElement(this.closeButton, 5000);
+    this.closeButton.click();
     cy.wait(1000);
-    cy.log('✓ Verified: Closed success notification');
+    cy.log('✓ Verified: Closed notification/modal');
   }
 
   // ==================== MARK AS FULFILLED ====================
 
-  // Selector - Mark as fulfilled option
+  // Selector - Mark as fulfilled menu option
   get markAsFulfilledOption() {
-    // TODO: Update selector once DOM is provided
-    return cy.contains('Mark as fulfilled'); // Placeholder selector
+    return cy.get('[data-cy="order-action-mark-fulfilled"]');
   }
 
   // Action - Click mark as fulfilled
@@ -170,11 +169,9 @@ class OrderWorkflowPage {
     cy.log('✓ Verified: Clicked Mark as fulfilled option');
   }
 
-
-  // Selector - Confirm fulfill button
+  // Selector - Confirm fulfill button (btn-submit inside the modal)
   get confirmFulfillButton() {
-    // TODO: Update selector once DOM is provided
-    return cy.contains('button', 'Mark as fulfilled'); // Placeholder selector in dialog
+    return cy.get('[data-cy="btn-submit"]');
   }
 
   // Action - Click confirm fulfill button
@@ -187,10 +184,9 @@ class OrderWorkflowPage {
 
   // ==================== CHARGE INITIAL PAYMENT ====================
 
-  // Selector - Charge initial payment option
+  // Selector - Charge initial payment menu option
   get chargeInitialPaymentOption() {
-    // TODO: Update selector once DOM is provided
-    return cy.contains('Charge initial payment'); // Placeholder selector
+    return cy.get('[data-cy="order-action-charge-initial"]');
   }
 
   // Action - Click charge initial payment
@@ -201,36 +197,25 @@ class OrderWorkflowPage {
     cy.log('✓ Verified: Clicked Charge initial payment option');
   }
 
-  // Selector - Amount to charge display
-  get amountToChargeDisplay() {
-    // TODO: Update selector once DOM is provided
-    return cy.contains('span', 'Charge'); // Placeholder selector
-  }
-
-  // Action - Verify amount to charge
-  verifyAmountToCharge(expectedAmount) {
-    this.waitForElement(this.amountToChargeDisplay, 5000);
-    this.amountToChargeDisplay.should('contain', expectedAmount);
-    cy.log(`✓ Verified: Amount to charge is ${expectedAmount}`);
-  }
-
-  // Selector - Initial payment message input
+  // Selector - Initial payment message textarea (same label pattern as one-time payment)
   get initialPaymentMessageInput() {
-    return cy.contains('label', 'Message to customer').parent().find('textarea');
-}
+    return cy.contains('label', 'Message to customer')
+      .closest('.v-input, .v-field, div')
+      .find('textarea');
+  }
 
   // Action - Enter initial payment message
   enterInitialPaymentMessage(message) {
-    
-    this.initialPaymentMessageInput.clear().type(message);
+    this.waitForElement(this.initialPaymentMessageInput, 5000);
+    this.initialPaymentMessageInput.clear({ force: true }).type(message, { force: true });
     cy.log(`✓ Verified: Entered message: ${message}`);
   }
 
   // ==================== UPDATE PAYMENT METHOD ====================
 
-  // Selector - Update payment method option
+  // Selector - Update payment method menu option
   get updatePaymentMethodOption() {
-    return cy.contains('Update payment method');
+    return cy.get('[data-cy="order-action-payment-update"]');
   }
 
   // Action - Click update payment method option
@@ -241,38 +226,23 @@ class OrderWorkflowPage {
     cy.log('✓ Verified: Clicked Update payment method option');
   }
 
-  // Selector - Click here link
+  // Selector - "Click here" link in update payment method dialog
   get clickHereLink() {
     return cy.contains('a', 'Click here');
   }
 
-  // Action - Click the "Click here" link to open new tab
+  // Action - Click the "Click here" link (removes target="_blank" to stay in same tab)
   clickHereLinkToUpdatePayment() {
     this.waitForElement(this.clickHereLink, 5000);
-    // Remove target="_blank" to prevent new tab, then restore it
     this.clickHereLink.invoke('removeAttr', 'target').click();
     cy.log('✓ Verified: Clicked "Click here" link');
   }
 
-  // Selector - Close button in update payment method dialog
-  get closePaymentMethodDialogButton() {
-    return cy.get('[data-cy="btn-close"]');
-  }
-
-  // Action - Click close button
-  clickClosePaymentMethodDialog() {
-    this.waitForElement(this.closePaymentMethodDialogButton, 5000);
-    this.closePaymentMethodDialogButton.click();
-    cy.wait(1000);
-    cy.log('✓ Verified: Clicked Close button');
-  }
-
   // ==================== CUSTOMER DETAILS ====================
 
-  // Selector - Edit customer button
+  // Selector - Edit customer button (pencil icon)
   get editCustomerButton() {
-    // TODO: Update selector once DOM is provided
-    return cy.get('[data-test-id="btn-open-edit"]'); // Placeholder selector
+    return cy.get('[data-test-id="btn-open-edit"]');
   }
 
   // Action - Click edit customer
@@ -283,7 +253,7 @@ class OrderWorkflowPage {
     cy.log('✓ Verified: Clicked Edit customer button');
   }
 
-  // Selector - Given name input (Billing)
+  // Selector - Given name input (Billing) - uses custom path attribute
   get givenNameInput() {
     return cy.get('input[path="address.billing.first_name"]');
   }
@@ -295,7 +265,7 @@ class OrderWorkflowPage {
     cy.log(`✓ Verified: Updated given name to: ${name}`);
   }
 
-  // Selector - Surname input (Billing)
+  // Selector - Surname input (Billing) - uses custom path attribute
   get surnameInput() {
     return cy.get('input[path="address.billing.last_name"]');
   }
@@ -307,7 +277,7 @@ class OrderWorkflowPage {
     cy.log(`✓ Verified: Updated surname to: ${surname}`);
   }
 
-  // Selector - Street input (Billing)
+  // Selector - Street input (Billing) - uses custom path attribute
   get streetInput() {
     return cy.get('input[path="address.billing.street"]');
   }
@@ -319,30 +289,27 @@ class OrderWorkflowPage {
     cy.log(`✓ Verified: Updated street to: ${street}`);
   }
 
-  // Selector - Consent checkbox
+  // Selector - Consent checkbox (identified by its associated label text)
   get consentCheckbox() {
-    return cy.contains('I consent to the consequences').closest('label');
+    return cy.contains('label', 'I consent to the consequences')
+      .invoke('attr', 'for')
+      .then((forAttr) => cy.get(`#${forAttr}`));
   }
 
   // Action - Click consent checkbox
   clickConsentCheckbox() {
-    //this.waitForElement(this.consentCheckbox, 5000);
-    this.consentCheckbox.click({ force: true });
+    cy.contains('label', 'I consent to the consequences').click({ force: true });
     cy.log('✓ Verified: Checked consent checkbox');
   }
 
-  // Selector - Save customer button
+  // Selector - Save/Submit customer button
   get saveCustomerButton() {
-    // TODO: Update selector once DOM is provided
-    return cy.contains('button', 'Submit'); // Placeholder selector
+    return cy.get('[data-cy="btn-submit"]');
   }
 
-  // Action - Click save customer
+  // Action - Click save customer (consent first, then submit)
   clickSaveCustomer() {
-    // Click consent checkbox first
     this.clickConsentCheckbox();
-
-    // Then click submit button
     this.waitForElement(this.saveCustomerButton, 5000);
     this.saveCustomerButton.click();
     cy.wait(2000);
@@ -351,7 +318,6 @@ class OrderWorkflowPage {
 
   // Action - Verify customer information updated
   verifyCustomerInfo(givenName, surname) {
-    // TODO: Update selector once DOM is provided
     cy.contains(givenName).should('be.visible');
     cy.contains(surname).should('be.visible');
     cy.log(`✓ Verified: Customer info updated to ${givenName} ${surname}`);
