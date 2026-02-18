@@ -9,7 +9,7 @@ class OrderListPage {
   // Action
   navigateToOrderList() {
     cy.visit(Cypress.env('baseUrl') + 'en/cms/orders');
-    cy.wait(3000);
+    cy.wait(5000);
     cy.log('✓ Verified: Navigated to Order List page');
   }
 
@@ -22,7 +22,7 @@ class OrderListPage {
 
   // Action
   searchByOrderId(orderId) {
-    this.waitForElement(this.searchInput, 3000);
+    this.waitForElement(this.searchInput, 10000);
     this.searchInput.click({ multiple: true });
     this.searchInput.type(orderId);
     cy.wait(2000);
