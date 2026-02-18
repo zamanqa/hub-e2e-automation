@@ -37,6 +37,10 @@ describe('Order Management Workflow - E2E Tests', () => {
   it('Test 1: should create one-time payment successfully', () => {
     cy.log('========== Test 1: Create One-Time Payment ==========');
 
+    // Clear filters
+    OrderListPage.clearAllFilters();
+    cy.log('✓ Verified: Filters cleared successfully');
+
     // Click actions menu (three dots)
     OrderWorkflowPage.clickActionsMenu();
 
@@ -73,6 +77,10 @@ describe('Order Management Workflow - E2E Tests', () => {
   it('Test 2: should mark order as fulfilled', () => {
     cy.log('========== Test 2: Mark Order as Fulfilled ==========');
 
+    // Clear filters
+    OrderListPage.clearAllFilters();
+    cy.log('✓ Verified: Filters cleared successfully');
+
     // Click actions menu
     OrderWorkflowPage.clickActionsMenu();
 
@@ -104,6 +112,10 @@ describe('Order Management Workflow - E2E Tests', () => {
   // ==================== Test 3: Charge Initial Payment ====================
   it('Test 3: should charge initial payment', () => {
     cy.log('========== Test 3: Charge Initial Payment ==========');
+
+    // Clear filters
+    OrderListPage.clearAllFilters();
+    cy.log('✓ Verified: Filters cleared successfully');
 
     // Click actions menu
     OrderWorkflowPage.clickActionsMenu();
@@ -145,6 +157,10 @@ describe('Order Management Workflow - E2E Tests', () => {
   it('Test 4: should update customer information', () => {
     cy.log('========== Test 4: Update Customer Information ==========');
 
+    // Clear filters
+    OrderListPage.clearAllFilters();
+    cy.log('✓ Verified: Filters cleared successfully');
+
     // Click edit customer button
     OrderWorkflowPage.clickEditCustomer();
 
@@ -173,6 +189,10 @@ describe('Order Management Workflow - E2E Tests', () => {
   // ==================== Test 5: Verify Navigation Between Tabs ====================
   it('Test 5: should navigate between all tabs successfully', () => {
     cy.log('========== Test 5: Verify Navigation Between Tabs ==========');
+
+    // Clear filters
+    OrderListPage.clearAllFilters();
+    cy.log('✓ Verified: Filters cleared successfully');
 
     // Click General tab and verify URL hash
     OrderWorkflowPage.clickGeneralTab();
@@ -205,6 +225,10 @@ describe('Order Management Workflow - E2E Tests', () => {
   // ==================== Test 6: Update Payment Method ====================
   it('Test 6: should update payment method from menu', () => {
     cy.log('========== Test 6: Update Payment Method ==========');
+
+    // Clear filters
+    OrderListPage.clearAllFilters();
+    cy.log('✓ Verified: Filters cleared successfully');
 
     // Click actions menu
     OrderWorkflowPage.clickActionsMenu();
