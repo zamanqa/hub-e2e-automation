@@ -64,6 +64,69 @@ class CronPage {
       });
   }
 
+  // ==================== API: TRIGGER INVOICE CHARGE ====================
+
+  /**
+   * Call the Lumen endpoint to push invoice charge jobs into the queue.
+   *
+   * POST /{companyId}/circulydb/invoices/charge-queue
+   * @param {string} companyId - company UUID from invoices.company_id (Step 0 query)
+   * @param {string} token - bearer token from lumenLogin()
+   * @returns {Cypress.Chainable<object>} - Cypress chain with full response
+   */
+  triggerInvoiceCharge(companyId, token) {
+    return cy
+      .request({
+        method: 'POST',
+        url: `${LUMEN_BASE_URL}/${companyId}/circulydb/invoices/charge-queue`,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+        failOnStatusCode: true,
+      })
+      .then((response) => {
+        return response; // no cy.* commands here — clean synchronous return
+      });
+  }
+
+  // ==================== RETRY: WAIT FOR TRANSACTION STATUS ====================
+
+  /**
+   * Poll the DB up to maxRetries times (1-minute intervals) until all transactions
+   * for the given invoice numbers have a status other than 'pending'.
+   * Breaks immediately once all are non-pending.
+   *
+   * @param {string[]} invoiceNumbers - array of invoice_number strings
+   * @param {number} maxRetries - maximum retry attempts (default 3)
+   */
+  waitForTransactionStatus(invoiceNumbers, maxRetries = 3) {
+    const attempt = (retriesLeft) => {
+      cy.log(`⏳ Checking transaction statuses — attempts remaining: ${retriesLeft}`);
+
+      cy.task('queryDb', CronQueries.getTransactionsByInvoiceNumbers(invoiceNumbers)).then((rows) => {
+        const allSettled = rows.every((row) => row.status !== 'pending');
+
+        if (allSettled) {
+          cy.log(`✓ All transactions are non-pending — loop complete`);
+          rows.forEach((row) => {
+            cy.log(`  invoice_number=${row.invoice_number} → status=${row.status}`);
+          });
+        } else if (retriesLeft > 0) {
+          const pending = rows.filter((r) => r.status === 'pending').map((r) => r.invoice_number);
+          cy.log(`⚠ Still pending for: [${pending.join(', ')}] — waiting 1 min...`);
+          cy.wait(60000);
+          attempt(retriesLeft - 1);
+        } else {
+          throw new Error(
+            `Transaction status still 'pending' after max retries for invoices: [${invoiceNumbers.join(', ')}]`
+          );
+        }
+      });
+    };
+
+    attempt(maxRetries);
+  }
+
   // ==================== RETRY: WAIT FOR INVOICES ====================
 
   /**
