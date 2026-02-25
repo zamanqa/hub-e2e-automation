@@ -144,6 +144,59 @@ class CronQueries {
     `;
   }
 
+  // ==================== INVOICE CHARGE CRON QUERIES ====================
+
+  /**
+   * Set ALL crons to active=true, running=false.
+   * Used in invoiceChargeProcess test — all crons enabled (not selective).
+   */
+  setAllCronsActive() {
+    return `
+      UPDATE public.cms_crons
+      SET active = true, running = false
+    `;
+  }
+
+  /**
+   * Read invoice_number, transaction_id and company_id from the invoices table.
+   * company_id is used as the endpoint path param — no hardcoded values.
+   * @param {number[]} ids - array of invoices.id values from testData.json cronTestInvoices
+   */
+  getInvoiceInfoByIds(ids) {
+    return `
+      SELECT i.invoice_number, i.transaction_id, i.company_id
+      FROM public.invoices i
+      WHERE i.id IN (${ids.join(',')})
+    `;
+  }
+
+  /**
+   * Count jobs in the invoiceCharge queue.
+   * Used to verify the charge-queue API call pushed at least 1 job.
+   */
+  getInvoiceChargeJobsCount() {
+    return `
+      SELECT COUNT(*) AS count
+      FROM public.jobs
+      WHERE queue IN ('invoiceCharge')
+    `;
+  }
+
+  /**
+   * Get transaction status for a set of invoice numbers.
+   * Used in the retry loop to check all transactions are no longer pending.
+   * @param {string[]} invoiceNumbers - array of invoice_number strings
+   */
+  getTransactionsByInvoiceNumbers(invoiceNumbers) {
+    const quoted = invoiceNumbers.map((n) => `'${n}'`).join(',');
+    return `
+      SELECT invoice_number, status
+      FROM public.transactions
+      WHERE invoice_number IN (${quoted})
+      ORDER BY invoice_number ASC
+    `;
+  }
+
   // ==================== INVOICE STATUS CHECKS ====================
 
   /**
