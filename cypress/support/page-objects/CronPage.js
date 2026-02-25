@@ -34,8 +34,7 @@ class CronPage {
         expect(response.body.success).to.be.true;
         const token = response.body.token;
         expect(token).to.be.a('string').and.not.be.empty;
-        cy.log(`✓ Lumen login successful — token acquired`);
-        return token;
+        return token; // no cy.* commands here — clean synchronous return
       });
   }
 
@@ -61,9 +60,7 @@ class CronPage {
         failOnStatusCode: true,
       })
       .then((response) => {
-        cy.wait(2000);
-        cy.log(`✓ Recurring payments triggered — response: ${JSON.stringify(response.body)}`);
-        return response;
+        return response; // no cy.* commands here — clean synchronous return
       });
   }
 
