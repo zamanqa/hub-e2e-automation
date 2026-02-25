@@ -37,41 +37,6 @@ class SubscriptionWorkflowQueries {
   }
 
   /**
-   * Get a pending-return or ended subscription for reactivation test
-   * Filters by:
-   * - Company: from Cypress.env('circuly_shopify_stripe')
-   * - Payment provider: stripe
-   * - Payment method: visa
-   * - Order status: open
-   * - Order origin: checkout
-   * - Subscription type: normal
-   * - Subscription status: pending return or __ended__
-   * - Subscription duration: > 5
-   */
-  getPendingReturnSubscriptionForReactivate() {
-    return `
-      SELECT
-        s.subscription_id
-      FROM subscriptions s
-      LEFT JOIN orders o ON o.order_id = s.order_id AND o.company_id = s.company_id
-      LEFT JOIN general_company_settings gcs ON o.company_id = gcs.uid
-      WHERE gcs.name IN ('${Cypress.env('circuly_shopify_stripe')}')
-        AND o.payment_provider = 'stripe'
-        AND o.payment_method_token = 'visa'
-        AND o.status = 'open'
-        AND o.origin = 'checkout'
-        AND s.subscription_type IN ('normal')
-        AND s.status IN ('pending return', 'ended', 'bought out', 'pending buyout')
-        AND s.subscription_duration > 5
-        AND s.parent_id IS NULL
-        AND and s.auto_renew = true
-        AND and s.subscription_frequency_interval IN (1)
-      ORDER BY s.created_at DESC
-      LIMIT 1 OFFSET 1
-    `;
-  }
-
-  /**
    * Verify subscription status in database
    * @param {string} subscriptionId - The subscription ID to check
    * @param {string} expectedStatus - Expected subscription status
@@ -123,32 +88,6 @@ class SubscriptionWorkflowQueries {
       UPDATE subscriptions
       SET subscription_type = 'normal', quantity = 2
       WHERE subscription_id = '${subscriptionId}'
-    `;
-  }
-
-  /**
-   * Get a consumable subscription with quantity not equal to 5 for Change Quantity test
-   */
-  getConsumableSubscriptionForQuantityTest() {
-    return `
-      SELECT
-        s.subscription_id
-      FROM subscriptions s
-      LEFT JOIN orders o ON o.order_id = s.order_id AND o.company_id = s.company_id
-      LEFT JOIN general_company_settings gcs ON o.company_id = gcs.uid
-      WHERE gcs.name IN ('${Cypress.env('circuly_shopify_stripe')}')
-        AND o.payment_provider = 'stripe'
-        AND o.payment_method_token = 'visa'
-        AND o.status = 'open'
-        AND o.origin = 'checkout'
-        AND s.subscription_type IN ('consumable')
-        AND s.status IN ('active')
-        AND s.subscription_duration > 5
-        AND s.parent_id IS NULL
-        AND s.subscription_frequency_interval IN (1)
-        AND s.quantity NOT IN (5)
-      ORDER BY s.created_at DESC
-      LIMIT 1 OFFSET 1
     `;
   }
 
