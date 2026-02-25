@@ -14,7 +14,7 @@ module.exports = defineConfig({
 
   // Global retries
   retries: {
-    runMode: 2,
+    runMode: 1,
     openMode: 0
   },
 
@@ -49,7 +49,7 @@ module.exports = defineConfig({
       // PostgreSQL configuration (from your previous project)
       pg_user: 'ZdFFUsWiIuILvub',
       pg_password: 'rxoz32pYOeqYEAMVG263',
-      pg_host: 'circuly-development-v12.csmudpdd3zlm.eu-central-1.rds.amazonaws.com',
+      pg_host: 'circuly-development-restore.csmudpdd3zlm.eu-central-1.rds.amazonaws.com',
       pg_database: 'postgres',
       ssl: false,
       pg_port: 5432,

@@ -144,7 +144,7 @@ class OrderWorkflowPage {
 
   // Selector - Close button in modal
   get closeButton() {
-    return cy.get('[data-cy="btn-close"]');
+    return cy.contains("Close");
   }
 
   // Action - Close success notification / modal
