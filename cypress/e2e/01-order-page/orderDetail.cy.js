@@ -140,11 +140,16 @@ describe('Order Detail Page - Comprehensive Tests', () => {
                 if (hasCreateButton) {
                   cy.log(`Creating subscription for row ${index + 1}`);
 
+                  // Read subscription type from column 8
+                  cy.wrap(row).find('td').eq(8).invoke('text').then((subType) => {
+                    const subscriptionType = subType.trim().toLowerCase();
+                    cy.log(`Row ${index + 1} subscription type: ${subscriptionType}`);
+
                   // Click Create Subscription button
                   OrderDetailPage.clickCreateSubscriptionForRow(index);
 
-                  // Execute subscription creation flow
-                  OrderDetailPage.createSubscriptionFlow();
+                  // Execute subscription creation flow (skip Generate/Add for digital)
+                  OrderDetailPage.createSubscriptionFlow(subscriptionType);
 
                   // Get the subscription ID after creation from hyperlink
                   cy.wrap(row).find('td').eq(0).find('a[href*="/subscriptions/"]').invoke('attr', 'href').then((href) => {
@@ -180,6 +185,7 @@ describe('Order Detail Page - Comprehensive Tests', () => {
                   });
 
                   cy.wait(2000);
+                  }); // end cy.wrap(row).find('td').eq(8)
                 }
               });
             });

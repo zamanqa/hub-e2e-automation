@@ -9,7 +9,7 @@ class OrderListPage {
   // Action
   navigateToOrderList() {
     cy.visit(Cypress.env('baseUrl') + 'en/cms/orders');
-    cy.wait(3000);
+    cy.wait(5000);
     cy.log('✓ Verified: Navigated to Order List page');
   }
 
@@ -17,12 +17,12 @@ class OrderListPage {
 
   // Selector
   get searchInput() {
-    return cy.get('.flex.flex-col.space-y-1.w-64').find('input[type="text"]').eq(0);
+    return cy.get('.w-64 input[placeholder="Search..."]');
   }
 
   // Action
   searchByOrderId(orderId) {
-    this.waitForElement(this.searchInput, 3000);
+    this.waitForElement(this.searchInput, 10000);
     this.searchInput.click({ multiple: true });
     this.searchInput.type(orderId);
     cy.wait(2000);
@@ -33,7 +33,7 @@ class OrderListPage {
   clickOnOrderFromList(orderId) {
     cy.get('tbody tr')
       .contains(orderId)
-      .click();
+      .click({ force: true });
     cy.wait(2000);
     cy.log(`✓ Verified: Clicked on order ${orderId} from list`);
   }
@@ -105,7 +105,7 @@ class OrderListPage {
 
   // Selector
   get generalTab() {
-    return cy.get('.v-tabs button').contains('General');
+    return cy.get('nav a').contains('General');
   }
 
   // Action
@@ -148,7 +148,7 @@ class OrderListPage {
 
   // Selector
   get paginationText() {
-    return cy.get('span[data-testid="from-to-of-total"]');
+    return cy.get('span[data-testid="from-to-of-total"]').first();
   }
 
   // Action
@@ -163,7 +163,7 @@ class OrderListPage {
 
   // Selector
   get firstPageButton() {
-    return cy.get('button[data-testid="btn-go-to-first"]');
+    return cy.get('button[data-testid="btn-go-to-first"]').first();
   }
 
   // Action
@@ -176,7 +176,7 @@ class OrderListPage {
 
   // Selector
   get previousPageButton() {
-    return cy.get('button[data-testid="btn-prev-page"]');
+    return cy.get('button[data-testid="btn-prev-page"]').first();
   }
 
   // Action
@@ -189,7 +189,7 @@ class OrderListPage {
 
   // Selector
   get nextPageButton() {
-    return cy.get('button[data-testid="btn-next-page"]');
+    return cy.get('button[data-testid="btn-next-page"]').first();
   }
 
   // Action
@@ -202,7 +202,7 @@ class OrderListPage {
 
   // Selector
   get lastPageButton() {
-    return cy.get('button[data-testid="btn-go-to-last"]');
+    return cy.get('button[data-testid="btn-go-to-last"]').first();
   }
 
   // Action
@@ -263,7 +263,7 @@ class OrderListPage {
 
   // Selector
   get exportButton() {
-    return cy.contains('span', 'Export');
+    return cy.contains('button', 'Export');
   }
 
   // Action

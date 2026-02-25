@@ -7,7 +7,7 @@ module.exports = defineConfig({
   // Global settings
   defaultCommandTimeout: 20000,
   chromeWebSecurity: false,
-  projectId: "fenkjz",
+  projectId: "ontjp9",
 
   // Reporter configuration (using cypress-mochawesome-reporter)
   reporter: "cypress-mochawesome-reporter",

@@ -24,6 +24,9 @@ describe('Order Management Workflow - E2E Tests', () => {
     // Navigate to order before each test
     OrderListPage.navigateToOrderList();
     cy.wait(3000);
+    // Clear filters
+    OrderListPage.clearAllFilters();
+    cy.log('✓ Verified: Filters cleared successfully');
     OrderListPage.searchByOrderId(testOrderId);
     OrderListPage.clickOnOrderFromList(testOrderId);
     cy.wait(3000);
@@ -203,7 +206,7 @@ describe('Order Management Workflow - E2E Tests', () => {
   });
 
   // ==================== Test 6: Update Payment Method ====================
-  it.only('Test 6: should update payment method from menu', () => {
+  it('Test 6: should update payment method from menu', () => {
     cy.log('========== Test 6: Update Payment Method ==========');
 
     // Click actions menu

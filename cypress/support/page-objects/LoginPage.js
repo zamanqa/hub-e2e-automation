@@ -7,7 +7,7 @@ class LoginPage {
 
   // Action
   enterEmail(email) {
-    this.emailInput.type(email);
+    this.emailInput.click().clear().type(email, { delay: 50 });
   }
 
   // ==================== PASSWORD INPUT ====================
@@ -18,7 +18,7 @@ class LoginPage {
 
   // Action
   enterPassword(password) {
-    this.passwordInput.type(password);
+    this.passwordInput.click().clear().type(password, { delay: 50 });
   }
 
   // ==================== SIGN IN BUTTON ====================
@@ -30,7 +30,7 @@ class LoginPage {
   // Action
   clickSignIn() {
     this.signInButton.click();
-    cy.wait(5000);
+    cy.wait(8000);
   }
 
   // Action
@@ -41,7 +41,7 @@ class LoginPage {
   // ==================== COMPANY SEARCH INPUT ====================
   // Selector
   get searchCompanyInput() {
-    return cy.get('#input-v-0-3');
+    return cy.get('input[placeholder="Search..."]');
   }
 
   // Action
