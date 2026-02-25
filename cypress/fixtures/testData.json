@@ -21,5 +21,10 @@
     "postalCode": "60318",
     "city": "Frankfurt am Main",
     "country": "Germany"
+  },
+  "cronTestInvoices": {
+    "inv1": "77291",
+    "inv2": "77285",
+    "inv3": "77285"
   }
 }

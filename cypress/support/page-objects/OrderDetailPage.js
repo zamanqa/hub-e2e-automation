@@ -29,7 +29,7 @@ class OrderDetailPage {
 
   // Selector for the note message textarea (stable class selector)
   get noteMessageInput() {
-    return cy.get('textarea.v-field__input');
+    return cy.get('textarea[path="message"]');
   }
 
   // Action to enter a note message
