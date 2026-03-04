@@ -118,8 +118,6 @@ describe('Invoice Charge Process', () => {
           cy.log('── Step 6: Wait 2 minutes for cron processing ──');
           cy.wait(120000);
 
-          cy.wait(3000);
-
           // ── STEP 7 ───────────────────────────────────────────────────────
           // invoice_numbers already stored from Step 0 — no extra query needed
           cy.log('── Step 7: invoice_numbers ready from Step 0 ──');

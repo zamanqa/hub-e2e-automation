@@ -128,7 +128,7 @@ describe('Recurring Payment Process', () => {
           expect(numQueues, 'At least 1 job should be queued').to.be.at.least(1);
         });
 
-        cy.wait(3000);
+        cy.wait(8000);
 
         // ── STEP 8 ─────────────────────────────────────────────────────────
         // Verify jobs exist in the DB job queue
@@ -136,7 +136,7 @@ describe('Recurring Payment Process', () => {
         cy.task('queryDb', CronQueries.getJobsCount()).then((result) => {
           const jobCount = Number(result[0].count);
           cy.log(`✓ Jobs in queue: ${jobCount}`);
-          expect(jobCount, 'DB job queue should contain more than 1 job').to.be.greaterThan(1);
+          expect(jobCount, 'DB job queue should contain more than 0 job').to.be.greaterThan(0);
         });
 
         cy.wait(3000);

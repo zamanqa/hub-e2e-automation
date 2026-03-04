@@ -29,6 +29,7 @@ class OrderQueries {
       LEFT JOIN general_company_settings gcs ON o.company_id = gcs.uid
       WHERE gcs.name IN ('${companyName}')
       ORDER BY o.created_at DESC
+      LIMIT 1
     `;
   }
 

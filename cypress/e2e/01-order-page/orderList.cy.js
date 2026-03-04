@@ -38,12 +38,8 @@ describe('Order List Page - Comprehensive Tests', () => {
     // Get first order ID from database
     cy.task('queryDb', OrderQueries.getAllOrdersForCompany()).then((orders) => {
       expect(orders).to.have.length.greaterThan(0);
-      const firstOrder = orders.reduce((prev, current) => {
-    return (new Date(prev.created_at) < new Date(current.created_at)) ? prev : current;
-  });
-  
-  const firstOrderId = firstOrder.order_id;  // Get the order ID of the first order
-  cy.log(`Found first order ID from DB: ${firstOrderId}`);
+      const firstOrderId = orders[0].order_id;
+      cy.log(`Found first order ID from DB: ${firstOrderId}`);
 
       // Search for this order
       OrderListPage.searchByOrderId(firstOrderId);
@@ -110,7 +106,7 @@ describe('Order List Page - Comprehensive Tests', () => {
     cy.log('✓ Verified: Export initiated for selected orders');
   });
 
-  it('Test 6: should query DB for 5th order, search and mark fulfilled', () => {
+  it('Test 6: should query DB for 1st order, search and mark fulfilled', () => {
     cy.log('========== Test 6: DB Query, Search and Mark Fulfilled ==========');
 
     // Navigate to Order List page
@@ -125,6 +121,7 @@ describe('Order List Page - Comprehensive Tests', () => {
 
         // Search for this order
         OrderListPage.searchByOrderId(orderId);
+        cy.wait(2000)
 
         // Verify order appears in table
         OrderListPage.verifyOrderInTable(orderId);

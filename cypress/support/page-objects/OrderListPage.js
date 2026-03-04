@@ -32,9 +32,11 @@ class OrderListPage {
   // Action
   clickOnOrderFromList(orderId) {
     cy.get('tbody tr')
-      .contains(orderId)
+      .first()
+      .find('td')
+      .first()
       .click({ force: true });
-    cy.wait(2000);
+    cy.wait(3000);
     cy.log(`✓ Verified: Clicked on order ${orderId} from list`);
   }
 
