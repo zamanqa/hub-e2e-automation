@@ -5,8 +5,8 @@
  * refund flow, cancel flow, and PDF download.
  */
 
-import InvoiceListPage from '../../support/page-objects/InvoiceListPage';
-import InvoiceQueries from '../../support/helpers/invoice-queries';
+import InvoiceListPage from '../../support/page-objects/04-invoice-page/InvoiceListPage';
+import InvoiceQueries from '../../support/helpers/04-invoice-page/invoice-queries';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Describe: Invoice List — Search, Filters & Actions
@@ -66,8 +66,6 @@ describe('Invoice List - Search, Filters & Actions', () => {
       cy.task('queryDb', InvoiceQueries.getInvoiceCountByStatuses(['succeeded', 'settled'])).then((result) => {
         const dbTotal = Number(result[0].total);
         cy.log(`✓ DB count for t.status IN ('succeeded', 'settled'): ${dbTotal}`);
-        //expect(filteredCount).to.equal(dbTotal);
-        //cy.log(`✓ Verified: UI (${filteredCount}) = DB (${dbTotal})`);
       });
     });
 

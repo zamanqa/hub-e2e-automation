@@ -1,0 +1,1493 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Circuly Hub — E2E Test Dashboard</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html, body {
+      height: 100%; overflow: hidden;
+    }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #1a1b2e; color: #d4d8f0;
+      display: flex; flex-direction: column;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #1a1b2e; }
+    ::-webkit-scrollbar-thumb { background: #353860; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #4a4f80; }
+
+    /* ── HEADER ── */
+    .header {
+      background: linear-gradient(135deg, #222540 0%, #1e2040 100%);
+      padding: 16px 28px; display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 12px; border-bottom: 1px solid #353860; flex-shrink: 0;
+    }
+    .header h1 { font-size: 20px; font-weight: 700; }
+    .header h1 .accent { color: #6c7bf0; }
+    .header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+
+    .server-pill {
+      display: flex; align-items: center; gap: 6px; background: #2d3050;
+      border: 1px solid #353860; border-radius: 20px; padding: 6px 14px;
+      font-size: 12px; font-weight: 600;
+    }
+    .server-dot {
+      width: 8px; height: 8px; border-radius: 50%; background: #f87171;
+    }
+    .server-dot.online { background: #4ade80; box-shadow: 0 0 6px #4ade80; }
+    .server-dot.offline { background: #f87171; box-shadow: 0 0 6px #f87171; }
+
+    .btn-sync {
+      background: #2d3050; color: #d4d8f0; border: 1px solid #353860;
+      border-radius: 6px; padding: 7px 16px; font-size: 13px; font-weight: 600;
+      cursor: pointer; transition: background 0.15s;
+    }
+    .btn-sync:hover { background: #353860; }
+
+    .btn-run-all {
+      border: none; border-radius: 6px; padding: 8px 18px;
+      font-size: 13px; font-weight: 700; cursor: pointer; transition: background 0.15s;
+    }
+    .btn-run-headed { background: #4ade80; color: #0a2a15; }
+    .btn-run-headed:hover { background: #3bce70; }
+    .btn-run-headless { background: #2d3050; color: #d4d8f0; border: 1px solid #353860; }
+    .btn-run-headless:hover { background: #353860; }
+    .btn-stop { background: #f87171; color: #fff; display: none; }
+    .btn-stop.visible { display: inline-block; }
+
+    /* ── STAT BOXES ── */
+    .stats-row {
+      display: flex; gap: 12px; padding: 14px 28px; flex-wrap: wrap;
+      border-bottom: 1px solid #353860; flex-shrink: 0;
+    }
+    .stat-box {
+      background: #222540; border: 1px solid #353860; border-radius: 8px;
+      padding: 10px 20px; text-align: center; min-width: 100px;
+    }
+    .stat-box .num { font-size: 26px; font-weight: 800; }
+    .stat-box .lbl { font-size: 11px; color: #8890b5; margin-top: 2px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-pass .num { color: #4ade80; }
+    .stat-fail .num { color: #f87171; }
+
+    /* ── TAB BAR ── */
+    .tab-bar {
+      display: flex; background: #222540; padding: 0 24px; gap: 2px;
+      border-bottom: 1px solid #353860; overflow-x: auto; flex-shrink: 0;
+    }
+    .tab-btn {
+      padding: 12px 18px; border: none; background: transparent; cursor: pointer;
+      font-size: 13px; font-weight: 500; color: #8890b5; white-space: nowrap;
+      border-bottom: 2px solid transparent; transition: all 0.15s;
+    }
+    .tab-btn:hover { color: #d4d8f0; }
+    .tab-btn.active { color: #6c7bf0; border-bottom-color: #6c7bf0; }
+    .tab-btn .badge {
+      display: inline-block; background: #353860; color: #8890b5;
+      font-size: 10px; font-weight: 700; border-radius: 10px; padding: 1px 7px; margin-left: 6px;
+    }
+    .tab-btn.active .badge { background: #6c7bf0; color: #fff; }
+
+    /* ── MAIN SPLIT ── */
+    .main-split { display: flex; flex: 1; overflow: hidden; }
+    .left-panel { flex: 1; overflow-y: auto; padding: 16px 20px; }
+    .right-panel {
+      width: 50%; min-width: 380px; flex-shrink: 0;
+      border-left: 1px solid #353860; display: flex; flex-direction: column;
+    }
+
+    /* ── ACCORDION ── */
+    .accordion { display: flex; flex-direction: column; gap: 6px; }
+
+    .acc-section { background: #222540; border: 1px solid #353860; border-radius: 6px; overflow: hidden; }
+    .acc-header {
+      display: flex; align-items: center; padding: 10px 14px;
+      cursor: pointer; user-select: none; gap: 10px; transition: background 0.15s;
+    }
+    .acc-header:hover { background: #2a2d50; }
+    .acc-section.open .acc-header { background: #2a2d50; border-bottom: 1px solid #353860; }
+    .acc-arrow { font-size: 11px; color: #8890b5; transition: transform 0.2s; flex-shrink: 0; }
+    .acc-section.open .acc-arrow { transform: rotate(90deg); }
+    .acc-filename {
+      font-weight: 600; font-size: 13px; color: #d4d8f0;
+      font-family: 'Consolas', 'Fira Code', 'Courier New', monospace; flex: 1;
+    }
+    .acc-counter {
+      font-size: 11px; color: #8890b5; flex-shrink: 0; margin-right: 4px;
+    }
+    .acc-counter .c-pass { color: #4ade80; }
+    .acc-counter .c-fail { color: #f87171; }
+
+    .btn-file-run {
+      border: none; border-radius: 5px; padding: 4px 12px;
+      font-size: 11px; font-weight: 700; cursor: pointer; flex-shrink: 0;
+      white-space: nowrap; transition: all 0.15s;
+    }
+    .btn-file-headed { background: #1a3a2a; color: #4ade80; border: 1px solid #2a5a3a; }
+    .btn-file-headed:hover { background: #2a5a3a; }
+    .btn-file-headless { background: #2d3050; color: #6c7bf0; border: 1px solid #353860; }
+    .btn-file-headless:hover { background: #353860; }
+    .btn-file-run.running { background: #3a2f1a; color: #fbbf24; border-color: #5a4a2a; cursor: default; }
+    .btn-file-run.passed { background: #1a3a2a; color: #4ade80; }
+    .btn-file-run.failed { background: #3a1a1a; color: #f87171; }
+
+    .acc-body { display: none; }
+    .acc-section.open .acc-body { display: block; }
+
+    /* ── TABLE ── */
+    .sheet { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .sheet thead tr { background: #2d3050; }
+    .sheet thead th {
+      padding: 8px 12px; text-align: left; font-weight: 700; font-size: 11px;
+      color: #8890b5; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;
+    }
+    .sheet tbody tr { border-bottom: 1px solid #2d3050; }
+    .sheet tbody tr:hover { background: #2a2d50; }
+    .sheet tbody td { padding: 8px 12px; vertical-align: middle; }
+    td.num { color: #8890b5; font-size: 11px; width: 36px; text-align: center; }
+    td.testcase { color: #d4d8f0; font-weight: 500; }
+
+    .db-yes { display: inline-block; background: #1a3a2a; color: #4ade80; border-radius: 4px; padding: 2px 8px; font-size: 10px; font-weight: 700; }
+    .db-no  { display: inline-block; background: #2d3050; color: #8890b5; border-radius: 4px; padding: 2px 8px; font-size: 10px; font-weight: 600; }
+
+    .badge-status {
+      display: inline-block; border-radius: 4px; padding: 3px 10px;
+      font-size: 10px; font-weight: 700; cursor: pointer; user-select: none;
+      text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap;
+      transition: transform 0.1s;
+    }
+    .badge-status:hover { transform: scale(1.05); }
+    .badge-notrun  { background: #2d3050; color: #8890b5; }
+    .badge-pass    { background: #1a3a2a; color: #4ade80; }
+    .badge-fail    { background: #3a1a1a; color: #f87171; }
+    .badge-blocked { background: #3a2f1a; color: #fbbf24; }
+    .badge-skip    { background: #2d3050; color: #6c7bf0; }
+
+    /* ── LIVE LOG PANEL ── */
+    .log-header {
+      display: flex; align-items: center; padding: 8px 14px; gap: 8px;
+      background: #222540; border-bottom: 1px solid #353860; flex-shrink: 0;
+    }
+    .log-header h3 { font-size: 13px; font-weight: 700; margin-right: auto; }
+    .log-line-count {
+      font-size: 10px; color: #8890b5; font-family: 'Consolas', monospace;
+      background: #2d3050; border-radius: 10px; padding: 2px 8px;
+    }
+    .log-autoscroll-pill {
+      font-size: 10px; font-weight: 600; border-radius: 10px; padding: 2px 10px;
+      cursor: pointer; border: 1px solid #353860; transition: all 0.15s; user-select: none;
+    }
+    .log-autoscroll-pill.on  { background: #1a3a2a; color: #4ade80; border-color: #2a5a3a; }
+    .log-autoscroll-pill.off { background: #3a2f1a; color: #fbbf24; border-color: #5a4a2a; }
+    .btn-log-tool {
+      background: none; border: 1px solid #353860; color: #8890b5;
+      border-radius: 4px; padding: 2px 8px; font-size: 11px; cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-log-tool:hover { color: #d4d8f0; border-color: #4a4f80; background: #2d3050; }
+    .btn-log-expand { font-size: 13px; padding: 2px 7px; }
+
+    .log-progress {
+      height: 4px; background: #2d3050; flex-shrink: 0; overflow: hidden;
+    }
+    .log-progress-bar {
+      height: 100%; width: 0%; background: linear-gradient(90deg, #6c7bf0, #4ade80);
+      transition: width 0.3s ease;
+    }
+    .log-error-summary {
+      display: none; background: #3a1a1a; border: 1px solid #5a2020;
+      margin: 8px 10px; border-radius: 6px; padding: 8px 12px; font-size: 11px;
+      font-family: 'Consolas', 'Fira Code', 'Courier New', monospace;
+      max-height: 140px; overflow-y: auto; flex-shrink: 0;
+    }
+    .log-error-summary.visible { display: block; }
+    .log-error-summary h4 { color: #f87171; margin-bottom: 4px; font-size: 11px; }
+    .log-error-item { color: #f87171; margin: 3px 0; padding-left: 10px; border-left: 2px solid #f87171; font-size: 11px; }
+    .log-body {
+      flex: 1; overflow-y: auto; padding: 8px 12px; min-height: 0;
+      font-family: 'Consolas', 'Fira Code', 'Courier New', monospace;
+      font-size: 11.5px; line-height: 1.55; white-space: pre-wrap; word-break: break-all;
+      background: #1a1b2e;
+    }
+    .log-line { display: block; }
+    .log-line:hover { background: rgba(108,123,240,0.06); }
+    .log-line .log-ts {
+      color: #555880; font-size: 10px; margin-right: 6px; user-select: none;
+    }
+    .log-pass { color: #4ade80; }
+    .log-fail { color: #f87171; }
+    .log-info { color: #6c7bf0; }
+    .log-warn { color: #fbbf24; }
+    .log-bold { color: #d4d8f0; font-weight: 700; }
+    .log-waiting { color: #8890b5; font-style: italic; }
+    .log-scroll-anchor {
+      display: none; position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+      background: #6c7bf0; color: #fff; border: none; border-radius: 16px;
+      padding: 5px 14px; font-size: 11px; font-weight: 600; cursor: pointer;
+      box-shadow: 0 2px 12px rgba(108,123,240,0.4); z-index: 5; transition: opacity 0.2s;
+    }
+    .log-scroll-anchor.visible { display: block; }
+    .log-wrap { position: relative; flex: 1; display: flex; flex-direction: column; min-height: 0; }
+
+    /* Fullscreen log mode */
+    .right-panel.fullscreen {
+      position: fixed; inset: 0; width: 100% !important; z-index: 400;
+      border-left: none; background: #1a1b2e;
+    }
+
+    /* ── TOAST ── */
+    .toast-container {
+      position: fixed; top: 16px; right: 16px; z-index: 1000;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .toast {
+      padding: 10px 18px; border-radius: 6px; font-size: 13px; font-weight: 600;
+      animation: toast-in 0.3s ease, toast-out 0.3s ease 2.7s forwards;
+      border: 1px solid;
+    }
+    .toast-success { background: #1a3a2a; color: #4ade80; border-color: #2a5a3a; }
+    .toast-error   { background: #3a1a1a; color: #f87171; border-color: #5a2020; }
+    .toast-info    { background: #222540; color: #6c7bf0; border-color: #353860; }
+    @keyframes toast-in { from { transform: translateX(40px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    @keyframes toast-out { from { transform: translateY(0); opacity: 1; } to { transform: translateY(-10px); opacity: 0; } }
+
+    /* ── REPORT OVERLAY ── */
+    .report-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.6);
+      z-index: 500; align-items: flex-start; justify-content: center;
+      padding: 24px 16px; overflow-y: auto;
+    }
+    .report-overlay.open { display: flex; }
+    .report-panel {
+      background: #222540; border-radius: 10px; width: 820px; max-width: 98vw;
+      box-shadow: 0 12px 40px rgba(0,0,0,0.5); overflow: hidden; margin: auto;
+      border: 1px solid #353860;
+    }
+    .report-panel-header {
+      background: linear-gradient(135deg, #2d3050, #222540); padding: 16px 22px;
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+      border-bottom: 1px solid #353860;
+    }
+    .report-panel-header h2 { font-size: 15px; font-weight: 700; color: #d4d8f0; flex: 1; }
+    .report-spec-label { font-size: 11px; color: #8890b5; font-family: 'Consolas', monospace; }
+    .report-close { background: none; border: none; color: #8890b5; font-size: 20px; cursor: pointer; }
+    .report-close:hover { color: #d4d8f0; }
+    .btn-pdf-download {
+      background: #4ade80; color: #0a2a15; border: none; border-radius: 5px;
+      padding: 6px 14px; font-size: 12px; font-weight: 700; cursor: pointer;
+      white-space: nowrap;
+    }
+    .btn-pdf-download:hover { background: #3bce70; }
+    .report-summary { display: flex; gap: 0; border-bottom: 1px solid #353860; }
+    .report-stat { flex: 1; text-align: center; padding: 16px 12px; border-right: 1px solid #353860; }
+    .report-stat:last-child { border-right: none; }
+    .report-stat .rs-num { font-size: 28px; font-weight: 800; }
+    .report-stat .rs-lbl { font-size: 11px; color: #8890b5; margin-top: 2px; }
+    .rs-total .rs-num { color: #6c7bf0; }
+    .rs-pass .rs-num  { color: #4ade80; }
+    .rs-fail .rs-num  { color: #f87171; }
+    .rs-dur .rs-num   { color: #8890b5; }
+    .report-body { padding: 0; max-height: 60vh; overflow-y: auto; }
+    .report-section-title {
+      padding: 10px 22px; font-size: 13px; font-weight: 700;
+      letter-spacing: 0.5px; border-bottom: 1px solid #353860;
+      display: flex; align-items: center; gap: 8px; cursor: pointer;
+    }
+    .rs-fail-title { background: #3a1a1a; color: #f87171; }
+    .rs-pass-title { background: #1a3a2a; color: #4ade80; }
+    .rs-pass-title::after { content: ' \25BE'; font-size: 11px; }
+    .rs-pass-title.collapsed::after { content: ' \25B8'; }
+    .report-test-fail { padding: 10px 22px; border-bottom: 1px solid #2d3050; }
+    .report-fail-title { font-weight: 600; color: #f87171; font-size: 13px; }
+    .report-fail-title::before { content: '\2717 '; }
+    .report-fail-msg {
+      margin-top: 6px; margin-left: 16px; font-family: 'Consolas', monospace;
+      font-size: 11px; color: #f87171; background: #2d1a1a; border-left: 3px solid #f87171;
+      padding: 6px 10px; border-radius: 3px; white-space: pre-wrap; word-break: break-word;
+    }
+    .report-test-pass {
+      padding: 7px 22px; border-bottom: 1px solid #2d3050;
+      font-size: 12px; color: #4ade80; display: flex; align-items: center; gap: 8px;
+    }
+    .report-test-pass::before { content: '\2713'; flex-shrink: 0; }
+    .report-test-pass .rp-dur { color: #8890b5; font-size: 11px; margin-left: auto; }
+    .report-empty { padding: 20px 22px; color: #8890b5; font-size: 13px; font-style: italic; }
+
+    /* ── REPORTS TAB ── */
+    .reports-toolbar { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; flex-wrap: wrap; }
+    .reports-toolbar .rt-title { font-size: 16px; font-weight: 700; flex: 1; }
+    .btn-refresh {
+      background: #2d3050; color: #6c7bf0; border: 1px solid #353860;
+      border-radius: 6px; padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer;
+    }
+    .btn-refresh:hover { background: #353860; }
+    .btn-delete-sel {
+      background: #3a1a1a; color: #f87171; border: 1px solid #5a2020;
+      border-radius: 6px; padding: 8px 14px; font-size: 13px; font-weight: 600; cursor: pointer; display: none;
+    }
+    .btn-delete-sel.visible { display: inline-block; }
+    .reports-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+    .rg-card {
+      background: #222540; border: 1px solid #353860; border-radius: 8px;
+      padding: 14px 16px; cursor: pointer; transition: all 0.15s; position: relative;
+    }
+    .rg-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,0.3); }
+    .rg-card.selected { border-color: #6c7bf0; }
+    .rg-check { position: absolute; top: 10px; right: 10px; width: 14px; height: 14px; cursor: pointer; }
+    .rg-delete {
+      background: transparent; color: #8890b5; border: 1px solid transparent;
+      border-radius: 5px; padding: 4px 8px; font-size: 13px; cursor: pointer; transition: all 0.15s;
+    }
+    .rg-delete:hover { background: #3a1a1a; color: #f87171; border-color: #5a2020; }
+    .rg-label { font-weight: 700; font-size: 13px; margin-bottom: 4px; }
+    .rg-time { font-size: 11px; color: #8890b5; margin-bottom: 8px; }
+    .rg-stats { display: flex; gap: 8px; align-items: center; margin-bottom: 8px; }
+    .rg-pass { color: #4ade80; font-weight: 700; font-size: 12px; }
+    .rg-fail { color: #f87171; font-weight: 700; font-size: 12px; }
+    .rg-view {
+      background: #6c7bf0; color: #fff; border: none; border-radius: 4px;
+      padding: 5px 12px; font-size: 11px; font-weight: 700; cursor: pointer; width: 100%;
+    }
+    .rg-view:hover { background: #5a6ae0; }
+    .reports-empty { text-align: center; padding: 60px 20px; color: #8890b5; }
+
+    /* ── FOOTER ── */
+    .footer {
+      background: #222540; color: #8890b5; text-align: center;
+      font-size: 11px; padding: 10px; border-top: 1px solid #353860; flex-shrink: 0;
+    }
+    .footer strong { color: #d4d8f0; }
+
+    /* ── HIDDEN PANELS ── */
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <h1>Circuly <span class="accent">Hub</span> — E2E Test Dashboard</h1>
+  <div class="header-right">
+    <div class="server-pill">
+      <span class="server-dot" id="server-dot"></span>
+      <span id="server-label">Checking…</span>
+    </div>
+    <button class="btn-sync" id="sync-btn" onclick="triggerSync()">Sync</button>
+    <button class="btn-run-all btn-run-headed" id="btn-run-headed" onclick="runAll('headed')">Run All Headed</button>
+    <button class="btn-run-all btn-run-headless" id="btn-run-headless" onclick="runAll('headless')">Run All Headless</button>
+    <button class="btn-run-all btn-stop" id="btn-stop" onclick="stopRun()">Stop</button>
+  </div>
+</div>
+
+<!-- STAT BOXES -->
+<div class="stats-row">
+  <div class="stat-box"><div class="num" id="stat-total">0</div><div class="lbl">Total Tests</div></div>
+  <div class="stat-box"><div class="num" id="stat-files">0</div><div class="lbl">Test Files</div></div>
+  <div class="stat-box"><div class="num" id="stat-modules">0</div><div class="lbl">Modules</div></div>
+  <div class="stat-box stat-pass"><div class="num" id="stat-passed">0</div><div class="lbl">Passed</div></div>
+  <div class="stat-box stat-fail"><div class="num" id="stat-failed">0</div><div class="lbl">Failed</div></div>
+</div>
+
+<!-- TAB BAR (built dynamically) -->
+<div class="tab-bar" id="tab-bar"></div>
+
+<!-- MAIN SPLIT -->
+<div class="main-split">
+  <!-- LEFT: Test Cases -->
+  <div class="left-panel" id="left-panel"></div>
+
+  <!-- RIGHT: Live Log -->
+  <div class="right-panel" id="right-panel">
+    <div class="log-header">
+      <h3>Live Log</h3>
+      <span class="log-line-count" id="log-line-count">0 lines</span>
+      <span class="log-autoscroll-pill on" id="log-autoscroll" onclick="toggleAutoScroll()" title="Toggle auto-scroll">Auto-scroll ON</span>
+      <button class="btn-log-tool" onclick="clearLog()">Clear</button>
+      <button class="btn-log-tool btn-log-expand" id="btn-log-expand" onclick="toggleLogFullscreen()" title="Expand / Collapse log">⛶</button>
+    </div>
+    <div class="log-progress"><div class="log-progress-bar" id="log-progress-bar"></div></div>
+    <div class="log-error-summary" id="log-error-summary"></div>
+    <div class="log-wrap">
+      <div class="log-body" id="log-body"><span class="log-waiting">Waiting for test run...</span></div>
+      <button class="log-scroll-anchor" id="log-scroll-anchor" onclick="scrollLogToBottom()">↓ New output</button>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  Circuly Hub E2E Automation Suite &nbsp;·&nbsp; <strong id="footer-files">0</strong> test files &nbsp;·&nbsp; <strong id="footer-total">0</strong> test cases
+</div>
+
+<!-- REPORT OVERLAY -->
+<div class="report-overlay" id="report-overlay" onclick="if(event.target===this)closeReport()">
+  <div class="report-panel">
+    <div class="report-panel-header">
+      <div>
+        <h2 id="report-title">Test Run Report</h2>
+        <div class="report-spec-label" id="report-spec-label"></div>
+      </div>
+      <button class="btn-pdf-download" onclick="downloadReportPdf()">Download PDF</button>
+      <button class="report-close" onclick="closeReport()">&times;</button>
+    </div>
+    <div class="report-summary">
+      <div class="report-stat rs-total"><div class="rs-num" id="rpt-total">0</div><div class="rs-lbl">Total</div></div>
+      <div class="report-stat rs-pass"><div class="rs-num" id="rpt-pass">0</div><div class="rs-lbl">Passed</div></div>
+      <div class="report-stat rs-fail"><div class="rs-num" id="rpt-fail">0</div><div class="rs-lbl">Failed</div></div>
+      <div class="report-stat rs-dur"><div class="rs-num" id="rpt-dur">&mdash;</div><div class="rs-lbl">Duration</div></div>
+    </div>
+    <div class="report-body" id="report-body"></div>
+  </div>
+</div>
+
+<!-- TOAST CONTAINER -->
+<div class="toast-container" id="toast-container"></div>
+
+<script>
+// ══════════════════════════════════════════════════════════════════════════════
+// TABS DATA — All test modules, files, and test cases
+// ══════════════════════════════════════════════════════════════════════════════
+const TABS = [
+  {
+    id: 'orders',
+    label: 'Orders',
+    num: '01',
+    files: [
+      {
+        name: '01-order-page/createManualOrder.cy.js',
+        spec: 'cypress/e2e/01-order-page/createManualOrder.cy.js',
+        tests: [
+          { title: 'Creates order with SERVICE + CONSUMABLE + DIGITAL items', db: false },
+        ]
+      },
+      {
+        name: '01-order-page/draftOrderCreation.cy.js',
+        spec: 'cypress/e2e/01-order-page/draftOrderCreation.cy.js',
+        tests: [
+          { title: 'Creates draft / quote order with SERVICE item', db: false },
+          { title: 'should create an order with three subscription items (service, consumable, digital)', db: false },
+        ]
+      },
+      {
+        name: '01-order-page/offlinePayOreateManualOrder.cy.js',
+        spec: 'cypress/e2e/01-order-page/offlinePayOreateManualOrder.cy.js',
+        tests: [
+          { title: 'Creates order with Charge by Invoice enabled', db: false },
+          { title: 'should create an order with three subscription items (service, consumable, digital)', db: false },
+        ]
+      },
+      {
+        name: '01-order-page/orderDetail.cy.js',
+        spec: 'cypress/e2e/01-order-page/orderDetail.cy.js',
+        tests: [
+          { title: 'Navigate to order detail and verify URL', db: false },
+          { title: 'Create a note and verify it is visible', db: false },
+          { title: 'Create subscriptions for all product rows and verify in DB', db: true },
+        ]
+      },
+      {
+        name: '01-order-page/orderList.cy.js',
+        spec: 'cypress/e2e/01-order-page/orderList.cy.js',
+        tests: [
+          { title: 'Filter orders successfully', db: false },
+          { title: 'Search for orders successfully', db: true },
+          { title: 'Clear filter button works correctly', db: false },
+          { title: 'Order count matches between DB and UI', db: true },
+          { title: 'Select multiple orders and export', db: false },
+          { title: 'Search order from DB and mark as fulfilled', db: true },
+          { title: 'Pagination controls work', db: false },
+          { title: 'Filter by Status = Open and verify URL parameter', db: false },
+          { title: 'Filter by Payment Status = Paid and verify URL parameter', db: false },
+          { title: 'Click Draft tab', db: false },
+          { title: 'Click Consumable tab', db: false },
+        ]
+      },
+      {
+        name: '01-order-page/orderWorkflow.cy.js',
+        spec: 'cypress/e2e/01-order-page/orderWorkflow.cy.js',
+        tests: [
+          { title: 'Create one-time payment', db: false },
+          { title: 'Mark order as fulfilled', db: true },
+          { title: 'Charge initial payment', db: true },
+          { title: 'Update customer information', db: false },
+          { title: 'Navigate between all order tabs', db: false },
+          { title: 'Update payment method from menu', db: false },
+        ]
+      },
+    ]
+  },
+  {
+    id: 'subscriptions',
+    label: 'Subscriptions',
+    num: '02',
+    files: [
+      {
+        name: '02-subscription-page/subscriptionDetail.cy.js',
+        spec: 'cypress/e2e/02-subscription-page/subscriptionDetail.cy.js',
+        tests: [
+          { title: 'Disable and re-enable auto-renew', db: false },
+          { title: 'Complete the buyout subscription process', db: true },
+          { title: 'Open change billing frequency modal and update frequency', db: true },
+          { title: 'Change quantity to 5 for consumable subscription', db: true },
+          { title: 'Change subscription length (+2) and installment unit price to 22', db: true },
+          { title: 'Open change extension price modal and update price to 20', db: false },
+          { title: 'Extend subscription by 5 billing cycles', db: false },
+          { title: 'Reactivate a pending return subscription', db: true },
+          { title: 'Replace serial number with a new random SN', db: true },
+          { title: 'Set subscription as ended', db: true },
+          { title: 'Set subscription to pending return', db: true },
+          { title: 'Swap subscription item', db: true },
+          { title: 'View order redirects to order detail page', db: false },
+        ]
+      },
+      {
+        name: '02-subscription-page/subscriptionListpage.cy.js',
+        spec: 'cypress/e2e/02-subscription-page/subscriptionListpage.cy.js',
+        tests: [
+          { title: 'Clear all filters and capture total record count', db: true },
+          { title: 'Filter by Status = Active and verify count matches DB', db: true },
+          { title: 'Filter by Type = Consumable', db: true },
+          { title: 'Select all rows via header checkbox and export', db: false },
+          { title: 'Test 5a: should display correct initial pagination state', db: true },
+          { title: 'Test 5b: should navigate to the next page and back', db: true },
+        ]
+      },
+      {
+        name: '02-subscription-page/subscriptionRP.cy.js',
+        spec: 'cypress/e2e/02-subscription-page/subscriptionRP.cy.js',
+        tests: [
+          { title: 'Delete RP1 and verify deleted_at is set in DB', db: true },
+          { title: 'Mark RP2 as settled', db: true },
+          { title: 'Mark RP3 as not paid', db: true },
+          { title: 'Charge RP4 and verify invoice_id is set in DB', db: true },
+          { title: 'Edit RP1 item amount to 20 (change all future payments)', db: true },
+        ]
+      },
+    ]
+  },
+  {
+    id: 'cron',
+    label: 'Cron',
+    num: '03',
+    files: [
+      {
+        name: '03-cron/invoiceChargeProcess.cy.js',
+        spec: 'cypress/e2e/03-cron/invoiceChargeProcess.cy.js',
+        tests: [
+          { title: 'Trigger invoice charge cron and verify transaction statuses are non-pending', db: true },
+        ]
+      },
+      {
+        name: '03-cron/recurringPaymentProcess.cy.js',
+        spec: 'cypress/e2e/03-cron/recurringPaymentProcess.cy.js',
+        tests: [
+          { title: 'Process recurring payments end-to-end via cron and generate invoices', db: true },
+        ]
+      },
+    ]
+  },
+  {
+    id: 'invoices',
+    label: 'Invoices',
+    num: '04',
+    files: [
+      {
+        name: '04-invoice-page/invoiceListpage.cy.js',
+        spec: 'cypress/e2e/04-invoice-page/invoiceListpage.cy.js',
+        tests: [
+          { title: 'Search by invoice number and return matching results', db: true },
+          { title: 'Filter by Status = Succeeded + Settled and verify count matches DB', db: true },
+          { title: 'Filter by Type = Recurring payment and verify count matches DB', db: true },
+          { title: 'Filter by Payment Status = Paid and verify count matches DB', db: true },
+          { title: 'Find first paid RP invoice (no cancelled ID) and navigate to detail', db: true },
+          { title: 'Refund a paid RP invoice and verify "fully refunded" badge', db: false },
+          { title: 'Cancel an invoice and verify cancelled_invoice_id is set in DB', db: true },
+          { title: 'Download invoice PDF and verify response status 200', db: false },
+        ]
+      },
+    ]
+  },
+  {
+    id: 'repair-return',
+    label: 'Repair & Return',
+    num: '05',
+    files: [
+      {
+        name: '05-repair-and-return/return-and-repair-workflow.cy.js',
+        spec: 'cypress/e2e/05-repair-and-return/return-and-repair-workflow.cy.js',
+        tests: [
+          { title: 'Handle return for target serial number', db: true },
+          { title: 'Initiate repair for target serial number', db: false },
+          { title: 'Verify location_status is updated to "in stock" after repair', db: true },
+        ]
+      },
+    ]
+  },
+];
+
+// ══════════════════════════════════════════════════════════════════════════════
+// CONSTANTS & STATE
+// ══════════════════════════════════════════════════════════════════════════════
+const SYNC_PORT = 7357;
+const ALL_SPEC  = 'cypress/e2e/**/*.cy.js';
+
+const STATUS_CYCLE  = ['notrun', 'pass', 'fail', 'blocked', 'skip'];
+const STATUS_LABELS = { notrun: 'NOT RUN', pass: 'PASS', fail: 'FAIL', blocked: 'BLOCKED', skip: 'SKIP' };
+const STATUS_CLASS  = { notrun: 'badge-notrun', pass: 'badge-pass', fail: 'badge-fail', blocked: 'badge-blocked', skip: 'badge-skip' };
+
+let activeTab      = TABS[0].id;
+let runningSource  = null;   // EventSource reference during a run
+let totalRunPassed = 0;
+let totalRunFailed = 0;
+let _report        = null;
+
+// ══════════════════════════════════════════════════════════════════════════════
+// RENDER
+// ══════════════════════════════════════════════════════════════════════════════
+function render() {
+  renderTabs();
+  renderContent();
+  updateGlobalStats();
+}
+
+function renderTabs() {
+  const bar = document.getElementById('tab-bar');
+  bar.innerHTML = '';
+  TABS.forEach(tab => {
+    const count = tab.files.reduce((s, f) => s + f.tests.length, 0);
+    const btn = document.createElement('button');
+    btn.className = 'tab-btn' + (tab.id === activeTab ? ' active' : '');
+    btn.innerHTML = `${tab.label} <span class="badge" id="badge-${tab.id}">${count}</span>`;
+    btn.onclick = () => switchTab(tab.id);
+    bar.appendChild(btn);
+  });
+  // Reports tab
+  const rBtn = document.createElement('button');
+  rBtn.className = 'tab-btn' + (activeTab === '_reports' ? ' active' : '');
+  rBtn.innerHTML = 'Reports <span class="badge">...</span>';
+  rBtn.onclick = () => { switchTab('_reports'); loadReports(); };
+  bar.appendChild(rBtn);
+}
+
+function switchTab(tabId) {
+  activeTab = tabId;
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  const btns = document.querySelectorAll('.tab-btn');
+  btns.forEach(b => {
+    if (tabId === '_reports' && b.textContent.includes('Reports')) b.classList.add('active');
+    else if (b.textContent.includes(TABS.find(t => t.id === tabId)?.label || '___')) b.classList.add('active');
+  });
+  renderContent();
+}
+
+function renderContent() {
+  const panel = document.getElementById('left-panel');
+  panel.innerHTML = '';
+
+  if (activeTab === '_reports') {
+    renderReportsPanel(panel);
+    return;
+  }
+
+  const tab = TABS.find(t => t.id === activeTab);
+  if (!tab) return;
+
+  tab.files.forEach((file, fIdx) => {
+    const section = document.createElement('div');
+    section.className = 'acc-section open';
+    section.id = `acc-${tab.id}-f${fIdx}`;
+
+    // Header
+    const header = document.createElement('div');
+    header.className = 'acc-header';
+    header.onclick = (e) => { if (e.target.closest('.btn-file-run')) return; section.classList.toggle('open'); };
+
+    const passCount = file.tests.reduce((s, _, i) => {
+      const st = localStorage.getItem(`status:${tab.id}-f${fIdx}-t${i}`);
+      return s + (st === 'pass' ? 1 : 0);
+    }, 0);
+    const failCount = file.tests.reduce((s, _, i) => {
+      const st = localStorage.getItem(`status:${tab.id}-f${fIdx}-t${i}`);
+      return s + (st === 'fail' ? 1 : 0);
+    }, 0);
+
+    let counterHtml = `<span class="acc-counter" id="counter-${tab.id}-f${fIdx}">${passCount}/${file.tests.length} passed`;
+    if (failCount > 0) counterHtml += ` <span class="c-fail">${failCount} failed</span>`;
+    counterHtml += '</span>';
+
+    header.innerHTML = `
+      <span class="acc-arrow">&#9654;</span>
+      <span class="acc-filename">${file.name}</span>
+      ${counterHtml}
+      <button class="btn-file-run btn-file-headed" id="runbtn-headed-${tab.id}-f${fIdx}"
+        onclick="event.stopPropagation();runFile('${tab.id}',${fIdx},'headed')">Headed</button>
+      <button class="btn-file-run btn-file-headless" id="runbtn-headless-${tab.id}-f${fIdx}"
+        onclick="event.stopPropagation();runFile('${tab.id}',${fIdx},'headless')">Headless</button>
+    `;
+    section.appendChild(header);
+
+    // Body
+    const body = document.createElement('div');
+    body.className = 'acc-body';
+    let tableHtml = `<table class="sheet"><thead><tr>
+      <th style="width:40px">#</th><th>Test Case</th><th style="width:90px">DB Verified</th><th style="width:100px">Status</th>
+    </tr></thead><tbody>`;
+
+    file.tests.forEach((test, tIdx) => {
+      const key = `${tab.id}-f${fIdx}-t${tIdx}`;
+      const saved = localStorage.getItem(`status:${key}`) || 'notrun';
+      tableHtml += `<tr>
+        <td class="num">${tIdx + 1}</td>
+        <td class="testcase">${escHtml(test.title)}</td>
+        <td>${test.db ? '<span class="db-yes">Yes</span>' : '<span class="db-no">No</span>'}</td>
+        <td><span class="badge-status ${STATUS_CLASS[saved]}" data-key="${key}" onclick="cycleStatus(this)">${STATUS_LABELS[saved]}</span></td>
+      </tr>`;
+    });
+
+    tableHtml += '</tbody></table>';
+    body.innerHTML = tableHtml;
+    section.appendChild(body);
+    panel.appendChild(section);
+  });
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// STATUS
+// ══════════════════════════════════════════════════════════════════════════════
+function cycleStatus(el) {
+  const key = el.dataset.key;
+  const current = STATUS_CYCLE.find(s => el.classList.contains(STATUS_CLASS[s])) || 'notrun';
+  const next = STATUS_CYCLE[(STATUS_CYCLE.indexOf(current) + 1) % STATUS_CYCLE.length];
+  el.className = 'badge-status ' + STATUS_CLASS[next];
+  el.textContent = STATUS_LABELS[next];
+  localStorage.setItem(`status:${key}`, next);
+  updateGlobalStats();
+  updateAccordionCounters();
+}
+
+function updateGlobalStats() {
+  let totalTests = 0, totalFiles = 0, passed = 0, failed = 0;
+  TABS.forEach(tab => {
+    totalFiles += tab.files.length;
+    tab.files.forEach((file, fIdx) => {
+      file.tests.forEach((_, tIdx) => {
+        totalTests++;
+        const st = localStorage.getItem(`status:${tab.id}-f${fIdx}-t${tIdx}`);
+        if (st === 'pass') passed++;
+        if (st === 'fail') failed++;
+      });
+    });
+  });
+  document.getElementById('stat-total').textContent   = totalTests;
+  document.getElementById('stat-files').textContent   = totalFiles;
+  document.getElementById('stat-modules').textContent = TABS.length;
+  document.getElementById('stat-passed').textContent  = passed;
+  document.getElementById('stat-failed').textContent  = failed;
+  document.getElementById('footer-files').textContent = totalFiles;
+  document.getElementById('footer-total').textContent = totalTests;
+}
+
+function updateAccordionCounters() {
+  const tab = TABS.find(t => t.id === activeTab);
+  if (!tab) return;
+  tab.files.forEach((file, fIdx) => {
+    const el = document.getElementById(`counter-${tab.id}-f${fIdx}`);
+    if (!el) return;
+    let p = 0, f = 0;
+    file.tests.forEach((_, tIdx) => {
+      const st = localStorage.getItem(`status:${tab.id}-f${fIdx}-t${tIdx}`);
+      if (st === 'pass') p++;
+      if (st === 'fail') f++;
+    });
+    el.innerHTML = `${p}/${file.tests.length} passed` + (f > 0 ? ` <span class="c-fail">${f} failed</span>` : '');
+  });
+}
+
+function resetStats() {
+  TABS.forEach(tab => {
+    tab.files.forEach((file, fIdx) => {
+      file.tests.forEach((_, tIdx) => {
+        localStorage.removeItem(`status:${tab.id}-f${fIdx}-t${tIdx}`);
+      });
+    });
+  });
+  totalRunPassed = 0;
+  totalRunFailed = 0;
+  document.getElementById('stat-passed').textContent = '0';
+  document.getElementById('stat-failed').textContent = '0';
+  renderContent();
+  updateGlobalStats();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// RUN SYSTEM (SSE)
+// ══════════════════════════════════════════════════════════════════════════════
+function runFile(tabId, fIdx, mode) {
+  const tab  = TABS.find(t => t.id === tabId);
+  const file = tab.files[fIdx];
+  if (!file) return;
+  _startRun(file.spec, file.name.split('/').pop(), mode, `runbtn-${mode}-${tabId}-f${fIdx}`);
+}
+
+function runAll(mode) {
+  if (runningSource) { toast('A run is already in progress', 'error'); return; }
+  resetStats();
+  _startRun(ALL_SPEC, 'All Tests', mode, null);
+}
+
+function _startRun(spec, label, mode, btnId) {
+  if (runningSource) { toast('A run is already in progress', 'error'); return; }
+
+  const btn = btnId ? document.getElementById(btnId) : null;
+  if (btn) { btn.classList.add('running'); btn.textContent = 'Running...'; }
+
+  // Show stop button
+  document.getElementById('btn-stop').classList.add('visible');
+  document.getElementById('btn-run-headed').disabled = true;
+  document.getElementById('btn-run-headless').disabled = true;
+
+  // Reset log
+  clearLog();
+  appendLog(`Starting: ${label} (${mode})\n`, 'log-info');
+  document.getElementById('log-progress-bar').style.width = '0%';
+
+  totalRunPassed = 0;
+  totalRunFailed = 0;
+  let specCount = 0, totalSpecs = 0;
+  _report = { passes: [], failures: [], spec, label, time: new Date().toLocaleString() };
+
+  const es = new EventSource(`http://127.0.0.1:${SYNC_PORT}/run?spec=${encodeURIComponent(spec)}&mode=${mode}`);
+  runningSource = es;
+
+  es.onmessage = (e) => {
+    const data = JSON.parse(e.data);
+
+    if (data.status === 'starting') {
+      appendLog(`Mode: ${data.mode || mode}\n`, 'log-info');
+    }
+
+    if (data.status === 'file-start') {
+      appendLog(`\n▶ ${data.file}\n`, 'log-info');
+    }
+
+    if (data.status === 'spec-done') {
+      specCount++;
+      totalSpecs = data.specTotal || totalSpecs;
+      totalRunPassed += (data.pass || 0);
+      totalRunFailed += (data.fail || 0);
+      document.getElementById('stat-passed').textContent = totalRunPassed;
+      document.getElementById('stat-failed').textContent = totalRunFailed;
+
+      const pct = totalSpecs > 0 ? Math.round((data.specPasses + data.specFailures) / totalSpecs * 100) : 0;
+      document.getElementById('log-progress-bar').style.width = `${pct}%`;
+
+      // Update badges for completed file and refresh counters
+      applySpecDoneToBadges(data.file || '', data.pass || 0, data.fail || 0);
+      updateAccordionCounters();
+    }
+
+    if (data.status === 'log') {
+      const text = data.text || '';
+      let cls = '';
+      if (text.includes('passing') || text.includes('✓')) cls = 'log-pass';
+      else if (text.includes('failing') || text.includes('✗') || text.includes('Error')) cls = 'log-fail';
+      appendLog(text, cls);
+    }
+
+    if (data.status === 'done') {
+      finishRun(es, btn, data, label, mode, btnId);
+    }
+
+    if (data.status === 'error') {
+      es.close(); runningSource = null;
+      appendLog(`\nERROR: ${data.message}\n`, 'log-fail');
+      resetRunUI(btn, btnId, mode);
+      toast('Run failed: ' + data.message, 'error');
+    }
+  };
+
+  es.onerror = () => {
+    es.close(); runningSource = null;
+    appendLog('\nERROR: Lost connection to sync server. Is it running?\n', 'log-fail');
+    resetRunUI(btn, btnId, mode);
+    toast('Lost connection to server', 'error');
+  };
+}
+
+function finishRun(es, btn, data, label, mode, btnId) {
+  es.close(); runningSource = null;
+
+  const rpt = data.report || {};
+  _report.passes   = rpt.passes   || [];
+  _report.failures = rpt.failures || [];
+  _report.stats    = rpt.stats    || null;
+
+  const hasMochawesomeData = _report.passes.length + _report.failures.length > 0;
+
+  // Apply mochawesome results to individual test badges
+  if (hasMochawesomeData) {
+    applyRunResultsToStatuses(_report.passes, _report.failures);
+  }
+  // else: spec-done events already called applySpecDoneToBadges during the run
+
+  // Determine final pass/fail counts
+  // Prefer mochawesome (per-test detail), fall back to spec-done totals
+  if (hasMochawesomeData) {
+    totalRunPassed = _report.passes.length;
+    totalRunFailed = _report.failures.length;
+  }
+  // else: totalRunPassed/totalRunFailed already set by spec-done events
+
+  document.getElementById('log-progress-bar').style.width = '100%';
+
+  appendLog(`\n─── Finished: ${totalRunPassed} passed, ${totalRunFailed} failed (exit ${data.exitCode}) ───\n`, data.ok ? 'log-pass' : 'log-fail');
+
+  // Show error summary if there are failures
+  if (_report.failures.length > 0) {
+    const summary = document.getElementById('log-error-summary');
+    summary.innerHTML = `<h4>Failed Tests (${_report.failures.length})</h4>` +
+      _report.failures.map(f => `<div class="log-error-item">${escHtml(f.title)}${f.err?.message ? ': ' + escHtml(f.err.message).slice(0, 120) : ''}</div>`).join('');
+    summary.classList.add('visible');
+  }
+
+  // Persist to localStorage
+  try {
+    localStorage.setItem('last_report', JSON.stringify({
+      passes: _report.passes, failures: _report.failures, stats: _report.stats,
+      spec: _report.spec, label: _report.label, time: _report.time,
+    }));
+  } catch(e) {}
+
+  resetRunUI(btn, btnId, mode);
+  updateAccordionCounters();
+  updateGlobalStats();
+
+  // IMPORTANT: Re-apply the actual run totals on top of updateGlobalStats()
+  // because updateGlobalStats reads from localStorage badges which may be
+  // incomplete if badge matching didn't cover all tests
+  document.getElementById('stat-passed').textContent = totalRunPassed;
+  document.getElementById('stat-failed').textContent = totalRunFailed;
+
+  if (data.ok) {
+    if (btn) { btn.classList.add('passed'); btn.textContent = 'Passed'; setTimeout(() => { btn.classList.remove('passed'); btn.textContent = mode === 'headed' ? 'Headed' : 'Headless'; }, 5000); }
+    toast(`All ${totalRunPassed} tests passed!`, 'success');
+  } else {
+    if (btn) { btn.classList.add('failed'); btn.textContent = 'Failed'; setTimeout(() => { btn.classList.remove('failed'); btn.textContent = mode === 'headed' ? 'Headed' : 'Headless'; }, 5000); }
+    toast(`${totalRunFailed} test(s) failed`, 'error');
+  }
+}
+
+function resetRunUI(btn, btnId, mode) {
+  document.getElementById('btn-stop').classList.remove('visible');
+  document.getElementById('btn-run-headed').disabled = false;
+  document.getElementById('btn-run-headless').disabled = false;
+  if (btn) { btn.classList.remove('running'); }
+}
+
+function stopRun() {
+  if (runningSource) {
+    runningSource.close();
+    runningSource = null;
+    appendLog('\n── Run stopped by user ──\n', 'log-warn');
+    document.getElementById('btn-stop').classList.remove('visible');
+    document.getElementById('btn-run-headed').disabled = false;
+    document.getElementById('btn-run-headless').disabled = false;
+    toast('Run stopped', 'info');
+    // Reset any running buttons
+    document.querySelectorAll('.btn-file-run.running').forEach(b => {
+      b.classList.remove('running');
+      b.textContent = b.classList.contains('btn-file-headed') ? 'Headed' : 'Headless';
+    });
+  }
+}
+
+// ── Badge Updates ──
+function specFileMatches(tabFileSpec, reportFile) {
+  if (!reportFile) return false;
+  const norm = p => (p || '').replace(/\\/g, '/');
+  const a = norm(tabFileSpec);
+  const b = norm(reportFile);
+  if (a === b) return true;
+  // Compare just the filename
+  const aFile = a.split('/').pop();
+  const bFile = b.split('/').pop();
+  if (aFile === bFile) return true;
+  // Check if one ends with the other
+  if (a.endsWith(bFile) || b.endsWith(aFile)) return true;
+  return false;
+}
+
+function applySpecDoneToBadges(specFile, passCount, failCount) {
+  if (!specFile) return;
+
+  TABS.forEach(tab => {
+    tab.files.forEach((file, fIdx) => {
+      if (!specFileMatches(file.spec, specFile)) return;
+
+      // If all passed → mark all pass; if all failed → mark all fail
+      // If mixed → don't set individual badges (wait for mochawesome detail)
+      let status = null;
+      if (failCount === 0 && passCount > 0) status = 'pass';
+      else if (passCount === 0 && failCount > 0) status = 'fail';
+      else if (passCount > 0 && failCount > 0) status = null; // mixed — skip
+      else return; // both zero
+
+      if (status) {
+        file.tests.forEach((_, tIdx) => {
+          const key = `${tab.id}-f${fIdx}-t${tIdx}`;
+          localStorage.setItem(`status:${key}`, status);
+          const badge = document.querySelector(`[data-key="${key}"]`);
+          if (badge) {
+            badge.className = 'badge-status ' + STATUS_CLASS[status];
+            badge.textContent = STATUS_LABELS[status];
+          }
+        });
+      }
+    });
+  });
+}
+
+function applyRunResultsToStatuses(passes, failures) {
+  // Normalize mochawesome title: strip describe-block prefixes to get just the it() title
+  function extractItTitle(fullTitle) {
+    const s = (fullTitle || '').trim().toLowerCase();
+    // Strip "Test N:" prefix
+    const m1 = s.match(/test\s+\d+[a-z]?:\s*(.*)/i);
+    if (m1) return m1[1].trim();
+    return s;
+  }
+
+  // Extract just the last part after any " > " or known describe patterns
+  function getCoreTitles(fullTitle) {
+    const cores = [];
+    const full = extractItTitle(fullTitle);
+    cores.push(full);
+    // If fullTitle has suite prefix (e.g., "Suite Name test title"), try the last meaningful chunk
+    // by splitting on common describe block patterns
+    const parts = full.split(/\s+(?=should\s|verify\s|handle\s|initiate\s|create\s|search\s|filter\s|find\s|refund\s|cancel\s|download\s|navigate\s|check\s|display\s|open\s|close\s|click\s|run\s|test\s)/i);
+    if (parts.length > 1) {
+      cores.push(parts.slice(1).join(' ').trim());
+    }
+    return cores;
+  }
+
+  function titleFuzzyMatch(reportTitle, tabTitle) {
+    const reportCores = getCoreTitles(reportTitle);
+    const tabCore = tabTitle.trim().toLowerCase();
+
+    for (const reportCore of reportCores) {
+      if (reportCore === tabCore) return true;
+      if (reportCore.includes(tabCore) || tabCore.includes(reportCore)) return true;
+    }
+
+    // Word overlap fallback (60%+)
+    const tabWords = tabCore.replace(/[^a-z0-9]+/g, ' ').trim().split(/\s+/).filter(w => w.length > 2);
+    const reportWords = reportCores[0].replace(/[^a-z0-9]+/g, ' ').trim().split(/\s+/).filter(w => w.length > 2);
+    if (tabWords.length > 0 && reportWords.length > 0) {
+      const overlap = tabWords.filter(w => reportWords.includes(w)).length;
+      if (overlap / tabWords.length >= 0.6) return true;
+    }
+    return false;
+  }
+
+  function findAndSetBadge(specPath, testTitle, status) {
+    let matched = false;
+
+    TABS.forEach(tab => {
+      tab.files.forEach((file, fIdx) => {
+        // Try file-based matching first; if specPath is empty, try all files
+        if (specPath && !specFileMatches(file.spec, specPath)) return;
+
+        file.tests.forEach((test, tIdx) => {
+          if (titleFuzzyMatch(testTitle, test.title)) {
+            const key = `${tab.id}-f${fIdx}-t${tIdx}`;
+            localStorage.setItem(`status:${key}`, status);
+            const badge = document.querySelector(`[data-key="${key}"]`);
+            if (badge) {
+              badge.className = 'badge-status ' + STATUS_CLASS[status];
+              badge.textContent = STATUS_LABELS[status];
+            }
+            matched = true;
+          }
+        });
+      });
+    });
+
+    if (!matched) {
+      console.warn('[badge] No match for:', testTitle, '| file:', specPath);
+    }
+  }
+
+  (passes || []).forEach(t => findAndSetBadge(t.file, t.title, 'pass'));
+  (failures || []).forEach(t => findAndSetBadge(t.file, t.title, 'fail'));
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// LOG
+// ══════════════════════════════════════════════════════════════════════════════
+let _logAutoScroll = true;
+let _logLineCount  = 0;
+let _logFullscreen = false;
+let _showTimestamps = true;
+
+// Detect user scroll — pause auto-scroll when user scrolls up, resume at bottom
+(function initLogScroll() {
+  document.addEventListener('DOMContentLoaded', () => {
+    const body = document.getElementById('log-body');
+    body.addEventListener('scroll', () => {
+      const atBottom = body.scrollHeight - body.scrollTop - body.clientHeight < 40;
+      if (atBottom && !_logAutoScroll) {
+        _logAutoScroll = true;
+        updateAutoScrollPill();
+        document.getElementById('log-scroll-anchor').classList.remove('visible');
+      } else if (!atBottom && _logAutoScroll) {
+        _logAutoScroll = false;
+        updateAutoScrollPill();
+      }
+      // Show "scroll to bottom" button when not at bottom and there's content
+      if (!atBottom && _logLineCount > 0) {
+        document.getElementById('log-scroll-anchor').classList.add('visible');
+      } else {
+        document.getElementById('log-scroll-anchor').classList.remove('visible');
+      }
+    });
+  });
+})();
+
+function toggleAutoScroll() {
+  _logAutoScroll = !_logAutoScroll;
+  updateAutoScrollPill();
+  if (_logAutoScroll) scrollLogToBottom();
+}
+
+function updateAutoScrollPill() {
+  const pill = document.getElementById('log-autoscroll');
+  pill.className = 'log-autoscroll-pill ' + (_logAutoScroll ? 'on' : 'off');
+  pill.textContent = _logAutoScroll ? 'Auto-scroll ON' : 'Auto-scroll OFF';
+}
+
+function scrollLogToBottom() {
+  const body = document.getElementById('log-body');
+  body.scrollTop = body.scrollHeight;
+  _logAutoScroll = true;
+  updateAutoScrollPill();
+  document.getElementById('log-scroll-anchor').classList.remove('visible');
+}
+
+function toggleLogFullscreen() {
+  const panel = document.getElementById('right-panel');
+  const btn   = document.getElementById('btn-log-expand');
+  _logFullscreen = !_logFullscreen;
+  panel.classList.toggle('fullscreen', _logFullscreen);
+  btn.textContent = _logFullscreen ? '✕' : '⛶';
+  btn.title = _logFullscreen ? 'Exit fullscreen' : 'Expand log fullscreen';
+}
+
+function updateLogLineCount() {
+  const el = document.getElementById('log-line-count');
+  el.textContent = `${_logLineCount} line${_logLineCount !== 1 ? 's' : ''}`;
+}
+
+function clearLog() {
+  document.getElementById('log-body').innerHTML = '<span class="log-waiting">Waiting for test run...</span>';
+  document.getElementById('log-progress-bar').style.width = '0%';
+  document.getElementById('log-error-summary').classList.remove('visible');
+  document.getElementById('log-error-summary').innerHTML = '';
+  document.getElementById('log-scroll-anchor').classList.remove('visible');
+  _logLineCount = 0;
+  _logAutoScroll = true;
+  updateLogLineCount();
+  updateAutoScrollPill();
+}
+
+function appendLog(text, className) {
+  const body = document.getElementById('log-body');
+  // Remove waiting message on first real log
+  const waiting = body.querySelector('.log-waiting');
+  if (waiting) waiting.remove();
+
+  // Create a line element with optional timestamp
+  const line = document.createElement('span');
+  line.className = 'log-line';
+
+  if (_showTimestamps) {
+    const ts = document.createElement('span');
+    ts.className = 'log-ts';
+    ts.textContent = new Date().toLocaleTimeString('en-GB', { hour12: false });
+    line.appendChild(ts);
+  }
+
+  const content = document.createElement('span');
+  if (className) content.className = className;
+  content.textContent = text;
+  line.appendChild(content);
+
+  body.appendChild(line);
+  _logLineCount++;
+  updateLogLineCount();
+
+  // Auto-scroll only if enabled
+  if (_logAutoScroll) {
+    body.scrollTop = body.scrollHeight;
+  } else {
+    // Show anchor button when new content arrives and user is scrolled up
+    document.getElementById('log-scroll-anchor').classList.add('visible');
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// REPORTS TAB
+// ══════════════════════════════════════════════════════════════════════════════
+let _reportsData = [];
+let _selectedReports = new Set();
+
+function renderReportsPanel(panel) {
+  panel.innerHTML = `
+    <div class="reports-toolbar">
+      <span class="rt-title">Run History</span>
+      <button class="btn-refresh" onclick="loadReports()">Refresh</button>
+      <button class="btn-delete-sel" id="btn-delete-sel" onclick="deleteSelectedReports()">Delete Selected</button>
+    </div>
+    <div id="reports-grid-wrap"><div class="reports-empty">Loading reports...</div></div>
+  `;
+  loadReports();
+}
+
+function loadReports() {
+  const wrap = document.getElementById('reports-grid-wrap');
+  if (!wrap) return;
+  wrap.innerHTML = '<div class="reports-empty">Loading...</div>';
+
+  fetch(`http://127.0.0.1:${SYNC_PORT}/reports`)
+    .then(r => r.json())
+    .then(data => {
+      _reportsData = data.reports || [];
+      _selectedReports.clear();
+      renderReportsList();
+    })
+    .catch(() => {
+      wrap.innerHTML = '<div class="reports-empty">Could not load reports. Is the sync server running?</div>';
+    });
+}
+
+function renderReportsList() {
+  const wrap = document.getElementById('reports-grid-wrap');
+  if (!wrap) return;
+
+  if (!_reportsData.length) {
+    wrap.innerHTML = '<div class="reports-empty">No runs yet. Run a test file and results will appear here.</div>';
+    return;
+  }
+
+  const grid = document.createElement('div');
+  grid.className = 'reports-grid';
+
+  _reportsData.forEach((r, idx) => {
+    const card = document.createElement('div');
+    card.className = 'rg-card';
+    card.innerHTML = `
+      <input type="checkbox" class="rg-check" onclick="event.stopPropagation();toggleReportSelection('${r.file}')" />
+      <div class="rg-label">${r.ok ? '✅' : '❌'} ${escHtml(r.label || r.file)}</div>
+      <div class="rg-time">${r.time || ''}</div>
+      <div class="rg-stats">
+        <span class="rg-pass">✓ ${r.passes}</span>
+        ${r.failures > 0 ? `<span class="rg-fail">✗ ${r.failures}</span>` : ''}
+        <span style="color:#8890b5;font-size:11px">${r.duration ? (r.duration / 1000).toFixed(1) + 's' : ''}</span>
+      </div>
+      <div style="display:flex;gap:6px;margin-top:6px;">
+        <button class="rg-view" onclick="event.stopPropagation();viewHistoryReport('${r.file}')">View Report</button>
+        <button class="rg-delete" onclick="event.stopPropagation();deleteSingleReport('${r.file}')" title="Delete report">🗑️</button>
+      </div>
+    `;
+    card.onclick = () => {
+      const cb = card.querySelector('.rg-check');
+      cb.checked = !cb.checked;
+      card.classList.toggle('selected', cb.checked);
+      toggleReportSelection(r.file);
+    };
+    grid.appendChild(card);
+  });
+
+  wrap.innerHTML = '';
+  wrap.appendChild(grid);
+}
+
+function toggleReportSelection(file) {
+  if (_selectedReports.has(file)) _selectedReports.delete(file);
+  else _selectedReports.add(file);
+  const btn = document.getElementById('btn-delete-sel');
+  if (btn) btn.classList.toggle('visible', _selectedReports.size > 0);
+}
+
+function deleteSelectedReports() {
+  if (!_selectedReports.size) return;
+  if (!confirm(`Delete ${_selectedReports.size} report(s)?`)) return;
+  fetch(`http://127.0.0.1:${SYNC_PORT}/reports/delete`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ files: [..._selectedReports] }),
+  }).then(() => loadReports()).catch(() => toast('Could not delete', 'error'));
+}
+
+function deleteSingleReport(file) {
+  if (!confirm('Delete this report?')) return;
+  fetch(`http://127.0.0.1:${SYNC_PORT}/reports/delete`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ files: [file] }),
+  })
+    .then(() => { toast('Report deleted', 'success'); loadReports(); })
+    .catch(() => toast('Could not delete report', 'error'));
+}
+
+function viewHistoryReport(file) {
+  fetch(`http://127.0.0.1:${SYNC_PORT}/reports/get?file=${encodeURIComponent(file)}`)
+    .then(r => r.json())
+    .then(data => {
+      if (!data.detail) { toast('No detail available', 'error'); return; }
+      _report = {
+        passes: data.detail.passes || [], failures: data.detail.failures || [],
+        stats: data.detail.stats || null, spec: data.spec || file,
+        label: data.label || file, time: data.time || '',
+      };
+      openReport();
+    })
+    .catch(() => toast('Could not load report', 'error'));
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// REPORT OVERLAY
+// ══════════════════════════════════════════════════════════════════════════════
+function openReport() {
+  if (!_report) return;
+  const { passes, failures, spec, label, time, stats } = _report;
+  const dur = stats?.duration ? (stats.duration / 1000).toFixed(1) + 's' : '—';
+  const total = passes.length + failures.length;
+
+  document.getElementById('report-title').textContent = `Report — ${label}`;
+  document.getElementById('report-spec-label').textContent = `${spec}  ·  ${time}`;
+  document.getElementById('rpt-total').textContent = total;
+  document.getElementById('rpt-pass').textContent  = passes.length;
+  document.getElementById('rpt-fail').textContent  = failures.length;
+  document.getElementById('rpt-dur').textContent   = dur;
+
+  const body = document.getElementById('report-body');
+  body.innerHTML = '';
+
+  if (total === 0) {
+    body.innerHTML = '<div class="report-empty">No detailed test data available. Ensure mochawesome reporter is configured.</div>';
+    document.getElementById('report-overlay').classList.add('open');
+    return;
+  }
+
+  // Failures
+  if (failures.length > 0) {
+    const h = document.createElement('div');
+    h.className = 'report-section-title rs-fail-title';
+    h.textContent = `✗ Failures (${failures.length})`;
+    body.appendChild(h);
+    failures.forEach(t => {
+      const row = document.createElement('div');
+      row.className = 'report-test-fail';
+      row.innerHTML = `<div class="report-fail-title">${escHtml(t.title)}</div>`;
+      if (t.err?.message) row.innerHTML += `<pre class="report-fail-msg">${escHtml(t.err.message)}</pre>`;
+      body.appendChild(row);
+    });
+  }
+
+  // Passes
+  const ph = document.createElement('div');
+  ph.className = 'report-section-title rs-pass-title' + (failures.length > 0 ? ' collapsed' : '');
+  ph.textContent = `✓ Passed (${passes.length})`;
+  const pc = document.createElement('div');
+  pc.style.display = failures.length > 0 ? 'none' : 'block';
+  ph.onclick = () => { const v = pc.style.display === 'none'; pc.style.display = v ? 'block' : 'none'; ph.classList.toggle('collapsed', !v); };
+  passes.forEach(t => {
+    const row = document.createElement('div');
+    row.className = 'report-test-pass';
+    row.innerHTML = `${escHtml(t.title)}<span class="rp-dur">${t.duration ? t.duration + 'ms' : ''}</span>`;
+    pc.appendChild(row);
+  });
+  body.appendChild(ph);
+  body.appendChild(pc);
+
+  document.getElementById('report-overlay').classList.add('open');
+}
+
+function closeReport() {
+  document.getElementById('report-overlay').classList.remove('open');
+}
+
+function downloadReportPdf() {
+  window.print();
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// SERVER HEALTH & SYNC
+// ══════════════════════════════════════════════════════════════════════════════
+function checkServer() {
+  fetch(`http://127.0.0.1:${SYNC_PORT}/ping`, { signal: AbortSignal.timeout(3000) })
+    .then(() => {
+      document.getElementById('server-dot').className = 'server-dot online';
+      document.getElementById('server-label').textContent = 'Server Online';
+    })
+    .catch(() => {
+      document.getElementById('server-dot').className = 'server-dot offline';
+      document.getElementById('server-label').textContent = 'Server Offline';
+    });
+}
+
+function triggerSync() {
+  const btn = document.getElementById('sync-btn');
+  btn.textContent = 'Syncing...'; btn.disabled = true;
+  fetch(`http://127.0.0.1:${SYNC_PORT}/sync`, { signal: AbortSignal.timeout(30000) })
+    .then(r => r.json())
+    .then(data => {
+      btn.textContent = 'Sync'; btn.disabled = false;
+      if (data.ok) { toast('Sync complete — reloading', 'success'); setTimeout(() => location.reload(), 800); }
+      else { toast('Sync failed', 'error'); }
+    })
+    .catch(() => { btn.textContent = 'Sync'; btn.disabled = false; toast('Server offline', 'error'); });
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// TOAST
+// ══════════════════════════════════════════════════════════════════════════════
+function toast(msg, type) {
+  const container = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className = `toast toast-${type || 'info'}`;
+  el.textContent = msg;
+  container.appendChild(el);
+  setTimeout(() => el.remove(), 3000);
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════════════════════════════
+function escHtml(str) {
+  return (str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════════════════════════════
+window.addEventListener('DOMContentLoaded', () => {
+  render();
+  checkServer();
+  setInterval(checkServer, 10000);
+
+  // Restore last report
+  try {
+    const raw = localStorage.getItem('last_report');
+    if (raw) _report = JSON.parse(raw);
+  } catch(e) {}
+});
+</script>
+</body>
+</html>

@@ -111,7 +111,7 @@ class OrderCreationPage {
     return cy.get('[id*="headlessui-combobox-button"]').first();
   }
 
-  // Action - Select first product from dropdown
+  // Action
   selectFirstProduct() {
     this.waitForElement(this.productDropdown);
     this.productDropdown.click();
@@ -134,7 +134,7 @@ class OrderCreationPage {
       .find('[id*="headlessui-combobox-button"]').first();
   }
 
-  // Action - Select first variant from dropdown
+  // Action
   selectFirstVariant() {
     this.waitForElement(this.variantDropdown);
     this.variantDropdown.click();
@@ -169,7 +169,7 @@ class OrderCreationPage {
       .find('button[id*="headlessui-listbox-button"]');
   }
 
-  // Action - Select first type option
+  // Action
   selectFirstType() {
     this.waitForElement(this.typeDropdown);
     this.typeDropdown.click();
@@ -184,7 +184,7 @@ class OrderCreationPage {
       });
   }
 
-  // Action - Select type by name (service, consumable, digital)
+  // Action
   selectTypeByName(typeName) {
     this.waitForElement(this.typeDropdown);
     this.typeDropdown.click();
@@ -234,7 +234,7 @@ class OrderCreationPage {
   }
 
   // ==================== UNIT PRICE & ROW TOTAL ====================
-  // Action - Verify Unit Price and Row Total (uses stored values)
+  // Action
   verifyPriceCalculation() {
     const rowTotal = this.priceValue * this.quantityValue;
     cy.wait(1000); // Wait for calculation
@@ -271,7 +271,7 @@ class OrderCreationPage {
       .find('button[id*="headlessui-listbox-button"]');
   }
 
-  // Action - Select monthly frequency
+  // Action
   selectMonthlyFrequency() {
     this.waitForElement(this.frequencyDropdown);
     this.frequencyDropdown.click();
@@ -320,7 +320,7 @@ class OrderCreationPage {
       .find('input[type="text"]');
   }
 
-  // Action - Click start date and select current date
+  // Action
   selectCurrentStartDate() {
     this.waitForElement(this.startDateInput);
     this.startDateInput.click();
@@ -347,7 +347,7 @@ class OrderCreationPage {
   }
 
   // Action
-  // Action - Get and log the End Date
+  // Action
   verifyEndDate() {
     this.waitForElement(this.endDateInput);
     this.endDateInput.invoke('val').then((endDateValue) => {

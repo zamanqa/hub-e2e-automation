@@ -6,6 +6,7 @@ cypress/e2e/chargebacks/
 reports/
 screenshots/
 videos/
+cypress/docs/run-history/
 scripts/
 .env
 *.log

@@ -1,6 +1,6 @@
-import SubscriptionListPage from '../../support/page-objects/SubscriptionListPage';
-import SubscriptionDetailPage from '../../support/page-objects/SubscriptionDetailPage';
-import SubscriptionWorkflowQueries from '../../support/helpers/subscription-workflow-queries';
+import SubscriptionListPage from '../../support/page-objects/02-subscription-page/SubscriptionListPage';
+import SubscriptionDetailPage from '../../support/page-objects/02-subscription-page/SubscriptionDetailPage';
+import SubscriptionWorkflowQueries from '../../support/helpers/02-subscription-page/subscription-workflow-queries';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Describe 1: Subscription Detail - 3-Dot Menu Actions

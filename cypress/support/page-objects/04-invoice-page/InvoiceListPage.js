@@ -17,13 +17,13 @@ class InvoiceListPage {
 
   // ==================== PAGINATION TEXT ====================
 
-  // Selector — "1-10 of 874"
+  // Selector
   // .first() prevents double-match from top + bottom pagination bars
   get paginationText() {
     return cy.get('[data-testid="from-to-of-total"]').first();
   }
 
-  // Action — wait until pagination counter is visible (used in beforeEach after navigation)
+  // Action
   waitForPaginationVisible() {
     this.paginationText.should('be.visible');
     cy.log('✓ Pagination text is visible');
@@ -57,7 +57,7 @@ class InvoiceListPage {
     return cy.get('tbody tr');
   }
 
-  // Action — click the ID cell (first td) to trigger navigation to invoice detail
+  // Action
   clickFirstInvoiceRow() {
     this.invoiceTableRows.should('have.length.at.least', 1);
     this.invoiceTableRows.first().find('a[href*="/invoices/"]').first().click({ force: true });
@@ -79,12 +79,13 @@ class InvoiceListPage {
     cy.log('✓ Cleared all filters');
   }
 
-  // Selector — Type HeadlessUI listbox button (v-0-2-3 confirmed: has "Recurring payment" option)
+  // Selector
+  // HeadlessUI listbox button (v-0-2-3): has "Recurring payment" option
   get typeDropdown() {
     return cy.get('#headlessui-listbox-button-v-0-2-3');
   }
 
-  // Action — open the Type dropdown and select option
+  // Action
   filterByType(type) {
     this.typeDropdown.should('be.visible').click();
     cy.get('[role="option"]').contains(type).should('be.visible').click();
@@ -92,12 +93,12 @@ class InvoiceListPage {
     cy.log(`✓ Filtered by Type: "${type}"`);
   }
 
-  // Selector — Status HeadlessUI listbox button
+  // Selector
   get statusDropdown() {
     return cy.get('#headlessui-listbox-button-v-0-2-5');
   }
 
-  // Action — open the Status dropdown and select one or more options
+  // Action
   // Dropdown stays open (multi-select) — opens once, clicks each with 2s gap
   // Pass multiple strings to multi-select: filterByStatus('Succeeded', 'Settled')
   filterByStatus(...statuses) {
@@ -113,12 +114,12 @@ class InvoiceListPage {
     cy.log(`✓ Filtered by Status: "${statuses.join(', ')}"`);
   }
 
-  // Selector — Payment Status HeadlessUI listbox button
+  // Selector
   get paymentStatusDropdown() {
     return cy.get('#headlessui-listbox-button-v-0-2-7');
   }
 
-  // Action — open the Payment Status dropdown and select option
+  // Action
   filterByPaymentStatus(status) {
     this.paymentStatusDropdown.should('be.visible').click();
     cy.get('[role="option"]').contains(status).should('be.visible').click();
@@ -128,9 +129,8 @@ class InvoiceListPage {
 
   // ==================== PAGINATION CONTROLS ====================
 
-  // Selectors — .first() because page renders top + bottom pagination bars
-
   // Selector
+  // .first() because page renders top + bottom pagination bars
   get firstPageButton() {
     return cy.get('[data-testid="btn-go-to-first"]').first();
   }
@@ -182,12 +182,12 @@ class InvoiceListPage {
     cy.log('✓ Clicked: Last page');
   }
 
-  // Selector — page size listbox
+  // Selector
   get pageSizeDropdown() {
     return cy.get('[data-testid="select-page-size"]').first();
   }
 
-  // Action — change items per page
+  // Action
   changePageSize(size) {
     this.pageSizeDropdown
       .find('button[aria-haspopup="listbox"]')
@@ -215,19 +215,20 @@ class InvoiceListPage {
     cy.log('✓ Clicked: Refund button');
   }
 
-  // Selector — "Full refund" toggle switch inside refund modal
+  // Selector
   get fullRefundOption() {
     return cy.get('[role="dialog"]').find('[role="switch"][aria-label="Full refund"]');
   }
 
-  // Selector — refund submit button inside modal (dynamic label: "Refund 0.00 €" etc.)
+  // Selector
+  // Dynamic label: "Refund 0.00 €" etc. — matched by startsWith('refund')
   get refundConfirmButton() {
     return cy.get('[role="dialog"]').find('button').filter((i, el) =>
       el.textContent.trim().toLowerCase().startsWith('refund')
     ).last();
   }
 
-  // Action — click "Full refund" to enable it, then click the Refund button
+  // Action
   confirmRefundModal() {
     this.fullRefundOption.should('be.visible').click();
     cy.wait(1000);
@@ -261,12 +262,12 @@ class InvoiceListPage {
 
   // ==================== INVOICE DETAIL — CANCEL ====================
 
-  // Selector — "Cancel invoice" button on the invoice detail page
+  // Selector
   get cancelButton() {
     return cy.contains('button', 'Cancel invoice');
   }
 
-  // Action — click Cancel invoice and wait for navigation to /cancel page
+  // Action
   clickCancelButton() {
     this.cancelButton.should('be.visible').and('not.be.disabled').click();
     cy.url().should('include', '/cancel');
@@ -274,13 +275,7 @@ class InvoiceListPage {
     cy.log('✓ Clicked: Cancel invoice → navigated to /cancel page');
   }
 
-  // Action — complete the cancel flow on the /cancel page:
-  //   1. Click "Cancel invoice" span button
-  //   2. Wait 2s
-  //   3. Select "Yes, I also want to generate a new invoice..." option
-  //   4. Click "Cancel" submit button
-  //   5. Verify "Successfully requested!" toast
-  //   6. Click "Close"
+  // Action
   confirmCancelFlow() {
     // Step 1: Click "Cancel invoice" on the /cancel page
     cy.contains('span', 'Cancel invoice').should('be.visible').click();
@@ -317,13 +312,14 @@ class InvoiceListPage {
 
   // ==================== INVOICE DETAIL — PDF DOWNLOAD ====================
 
-  // Action — set up intercept BEFORE clicking download (call this first)
+  // Action
   interceptPdfDownload() {
     cy.intercept('GET', '**/invoices/**').as('pdfDownload');
     cy.log('✓ PDF download intercept registered');
   }
 
-  // Selector — button contains a span with text " PDF " (icon + label, not "Download PDF")
+  // Selector
+  // Button text is " PDF " (icon + label), not "Download PDF"
   get downloadPdfButton() {
     return cy.contains('button', 'PDF');
   }
@@ -334,7 +330,7 @@ class InvoiceListPage {
     cy.log('✓ Clicked: Download PDF button');
   }
 
-  // Action — wait for intercepted response and assert status 200
+  // Action
   verifyPdfDownloaded() {
     cy.wait('@pdfDownload').its('response.statusCode').should('equal', 200);
     cy.log('✓ Verified: PDF download returned status 200');

@@ -1,6 +1,6 @@
-import SubscriptionListPage from '../../support/page-objects/SubscriptionListPage';
-import SubscriptionDetailPage from '../../support/page-objects/SubscriptionDetailPage';
-import SubscriptionRPQueries from '../../support/helpers/subscription-rp-queries';
+import SubscriptionListPage from '../../support/page-objects/02-subscription-page/SubscriptionListPage';
+import SubscriptionDetailPage from '../../support/page-objects/02-subscription-page/SubscriptionDetailPage';
+import SubscriptionRPQueries from '../../support/helpers/02-subscription-page/subscription-rp-queries';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Describe: Subscription Detail - Recurring Payments Actions

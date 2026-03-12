@@ -1,4 +1,4 @@
-import OrderCreationPage from '../../support/page-objects/OrderCreationPage';
+import OrderCreationPage from '../../support/page-objects/01-order-page/OrderCreationPage';
 
 describe('Order Creation - Add Items with Different Subscription Types', () => {
   let testData;

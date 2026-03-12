@@ -33,7 +33,7 @@ class OrderListPage {
   clickOnOrderFromList(orderId) {
     cy.get('tbody tr')
       .first()
-      .find('td')
+      .find('a[href*="/cms/orders/"]')
       .first()
       .click({ force: true });
     cy.wait(3000);

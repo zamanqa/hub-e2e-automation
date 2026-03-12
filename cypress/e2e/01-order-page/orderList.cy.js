@@ -1,5 +1,5 @@
-import OrderListPage from '../../support/page-objects/OrderListPage';
-import OrderQueries from '../../support/helpers/order-queries';
+import OrderListPage from '../../support/page-objects/01-order-page/OrderListPage';
+import OrderQueries from '../../support/helpers/01-order-page/order-queries';
 
 describe('Order List Page - Comprehensive Tests', () => {
   let testData;

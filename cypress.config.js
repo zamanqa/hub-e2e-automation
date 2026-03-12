@@ -43,33 +43,30 @@ module.exports = defineConfig({
       // Company IDs
       circuly_shopify_stripe: process.env.circuly_shopify_stripe || 'circuly shopify stripe',
 
-      // Checkout URL (from your previous project)
+      // Checkout URL
       url: 'https://circuly-checkout-development.herokuapp.com/en/',
 
-      // PostgreSQL configuration (from your previous project)
-      pg_user: 'ZdFFUsWiIuILvub',
-      pg_password: 'rxoz32pYOeqYEAMVG263',
-      pg_host: 'circuly-development-restore.csmudpdd3zlm.eu-central-1.rds.amazonaws.com',
-      pg_database: 'postgres',
+      // PostgreSQL configuration
+      pg_user: process.env.PG_USER,
+      pg_password: process.env.PG_PASSWORD,
+      pg_host: process.env.PG_HOST,
+      pg_database: process.env.PG_DATABASE || 'postgres',
       ssl: false,
-      pg_port: 5432,
+      pg_port: process.env.PG_PORT || 5432,
     },
 
     setupNodeEvents(on, config) {
       // Mochawesome reporter plugin
       require("cypress-mochawesome-reporter/plugin")(on);
 
-      // MySQL database tasks (existing)
-      require('./cypress/plugins/index.js')(on, config);
-
-      // PostgreSQL database task (from your previous project)
+      // PostgreSQL database task
       on("task", {
         async queryDb(queryString) {
           const { Client } = require("pg");
           const pgConfig = {
-            user: config.env.pg_user || "ZdFFUsWiIuILvub",
-            password: config.env.pg_password || "rxoz32pYOeqYEAMVG263",
-            host: config.env.pg_host || "development",
+            user: config.env.pg_user,
+            password: config.env.pg_password,
+            host: config.env.pg_host,
             database: config.env.pg_database || "postgres",
             ssl: false,
             port: config.env.pg_port || 5432,

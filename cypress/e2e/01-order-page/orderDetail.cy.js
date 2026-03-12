@@ -1,202 +1,103 @@
-import OrderListPage from '../../support/page-objects/OrderListPage';
-import OrderDetailPage from '../../support/page-objects/OrderDetailPage';
-import OrderQueries from '../../support/helpers/order-queries';
-import SubscriptionQueries from '../../support/helpers/subscription-queries';
+import OrderListPage from '../../support/page-objects/01-order-page/OrderListPage';
+import OrderDetailPage from '../../support/page-objects/01-order-page/OrderDetailPage';
+import OrderQueries from '../../support/helpers/01-order-page/order-queries';
+import SubscriptionQueries from '../../support/helpers/02-subscription-page/subscription-queries';
 
-describe('Order Detail Page - Comprehensive Tests', () => {
-  let testData;
+describe('Order Detail Page', () => {
   let testOrderId;
-  let testNoteMessage = 'Automated test note - ' + Date.now();
-  let collectedSubscriptions = {};
+  const testNoteMessage = `Automated test note - ${Date.now()}`;
 
   before(() => {
-    cy.fixture('testData').then((data) => {
-      testData = data;
+    cy.task('queryDb', OrderQueries.getFifthOrderWithoutSubscription()).then((orders) => {
+      expect(orders, 'Expected at least 1 order without subscription in DB').to.have.length.at.least(1);
+      testOrderId = orders[0].order_id;
+      cy.log(`✓ Test order from DB: ${testOrderId}`);
     });
   });
 
-  it('should complete all order detail page tests', () => {
-    cy.log('========== Order Detail Page - Complete Test Flow ==========');
+  beforeEach(() => {
+    OrderListPage.navigateToOrderList();
+    OrderListPage.searchByOrderId(testOrderId);
+    OrderListPage.clickOnOrderFromList(testOrderId);
+  });
 
-    // ==================== Step 1: Search and Open Order ====================
-    cy.log('--- Step 1: Search and Open Order ---');
+  // ===========================================================================
+  // TEST 1 — Navigate to order detail page and verify URL
+  // ===========================================================================
+  it('Test 1: should navigate to order detail page and verify URL', () => {
+    cy.log('========== Test 1: Navigate to Order Detail ==========');
 
-    // Get 2nd order without subscription from database
-    cy.task('queryDb', OrderQueries.getFifthOrderWithoutSubscription()).then((orders) => {
-      if (orders && orders.length > 0) {
-        const order = orders[0];
-        testOrderId = order.order_id;
-        cy.log(`Found order from DB: ${testOrderId}`);
+    OrderDetailPage.verifyUrlContainsOrderId(testOrderId);
 
-        // Navigate to Order List page
-        OrderListPage.navigateToOrderList();
-        cy.wait(5000);
+    cy.log('✓ Test 1 Completed: Order detail page URL verified');
+  });
 
-        // Search for the order
-        OrderListPage.searchByOrderId(testOrderId);
+  // ===========================================================================
+  // TEST 2 — Create a note and verify it appears in the notes section
+  // ===========================================================================
+  it('Test 2: should create a note and verify it is visible', () => {
+    cy.log('========== Test 2: Create and Verify Note ==========');
 
-        // Click on the order
-        OrderListPage.clickOnOrderFromList(testOrderId);
+    OrderDetailPage.clickCreateNote();
+    OrderDetailPage.enterNoteMessage(testNoteMessage);
+    OrderDetailPage.submitNote();
+    OrderDetailPage.verifyNoteExists(testNoteMessage);
 
-        // Wait for 2 seconds
-        cy.wait(3000);
+    cy.log('✓ Test 2 Completed: Note created and verified');
+  });
 
-        // Verify URL contains /orders/{order_id}
-        OrderDetailPage.verifyUrlContainsOrderId(testOrderId);
+  // ===========================================================================
+  // TEST 3 — Create subscriptions for all product rows and verify in DB
+  // ===========================================================================
+  it('Test 3: should create subscriptions for all products and verify in DB', () => {
+    cy.log('========== Test 3: Create Subscriptions for All Products ==========');
 
-        cy.log('✓ Verified: Successfully opened order detail page');
+    OrderDetailPage.getAllProductRows().then(($rows) => {
+      const rows = Array.from($rows);
+      cy.log(`Found ${rows.length} product rows`);
 
-        // ==================== Step 2: Create and Verify Note ====================
-        cy.log('--- Step 2: Create and Verify Note ---');
+      rows.forEach((row, index) => {
+        cy.wrap(row).find('button').then(($buttons) => {
+          const hasCreateButton = Array.from($buttons).some(btn =>
+            btn.textContent.includes('Create subscription')
+          );
 
-        // Click Create Note button
-        OrderDetailPage.clickCreateNote();
+          if (!hasCreateButton) return;
 
-        // Enter test message
-        OrderDetailPage.enterNoteMessage(testNoteMessage);
+          cy.log(`Creating subscription for row ${index + 1}`);
 
-        // Click Create button
-        OrderDetailPage.submitNote();
+          cy.wrap(row).find('td').eq(8).invoke('text').then((subType) => {
+            const subscriptionType = subType.trim().toLowerCase();
+            cy.log(`Row ${index + 1} subscription type: ${subscriptionType}`);
 
-        // Verify note appears in notes section
-        OrderDetailPage.verifyNoteExists(testNoteMessage);
+            OrderDetailPage.clickCreateSubscriptionForRow(index);
+            OrderDetailPage.createSubscriptionFlow(subscriptionType);
 
-        cy.log('✓ Verified: Note created and visible successfully');
+            cy.wrap(row).find('td').eq(0).find('a[href*="/subscriptions/"]').invoke('attr', 'href').then((href) => {
+              const subscriptionId = href.split('/subscriptions/')[1];
+              cy.log(`Created subscription ID: ${subscriptionId}`);
 
-        // ==================== Step 3: Product List and Subscription Creation ====================
-        cy.log('--- Step 3: Product List and Subscription Creation ---');
+              cy.task('queryDb', SubscriptionQueries.getSubscriptionById(subscriptionId)).then((result) => {
+                expect(result, `Expected subscription ${subscriptionId} in DB`).to.have.length.at.least(1);
+                const sub = result[0];
+                cy.log(`✓ DB verified — Status: ${sub.subscription_status}, Type: ${sub.subscription_type}`);
 
-        // Wait for page to load
-        cy.wait(2000);
-
-        // Collect subscriptions by type
-        cy.log('--- Collecting Subscription Types ---');
-
-        OrderDetailPage.getAllProductRows().then(($rows) => {
-          const rows = Array.from($rows);
-          cy.log(`Found ${rows.length} product rows`);
-
-          let consumableIndex = -1;
-          let normalIndex = -1;
-          let digitalIndex = -1;
-
-          // Find subscription types and their row indices
-          rows.forEach((row, index) => {
-            cy.wrap(row).find('td').eq(8).invoke('text').then((subscriptionType) => {
-              const type = subscriptionType.trim();
-              cy.log(`Row ${index + 1}: Subscription Type = ${type}`);
-
-              if (type === 'consumable' && consumableIndex === -1) {
-                consumableIndex = index;
-                cy.wrap(row).find('td').eq(5).invoke('text').then((subId) => {
-                  const fullSubId = subId.trim();
-                  collectedSubscriptions.consumable = fullSubId;
-                  cy.log(`✓ Found consumable subscription at row ${index + 1}: ${fullSubId}`);
+                cy.task('queryDb', SubscriptionQueries.hasRecurringPayments(sub.id)).then((recurringPayments) => {
+                  if (recurringPayments && recurringPayments.length > 0) {
+                    cy.log(`✓ Subscription has recurring payments enabled`);
+                  } else {
+                    cy.log(`⚠ Subscription does not have recurring payments enabled yet`);
+                  }
                 });
-              } else if (type === 'normal' && normalIndex === -1) {
-                normalIndex = index;
-                cy.wrap(row).find('td').eq(5).invoke('text').then((subId) => {
-                  const fullSubId = subId.trim();
-                  collectedSubscriptions.normal = fullSubId;
-                  cy.log(`✓ Found normal subscription at row ${index + 1}: ${fullSubId}`);
-                });
-              } else if (type === 'digital' && digitalIndex === -1) {
-                digitalIndex = index;
-                cy.wrap(row).find('td').eq(5).invoke('text').then((subId) => {
-                  const fullSubId = subId.trim();
-                  collectedSubscriptions.digital = fullSubId;
-                  cy.log(`✓ Found digital subscription at row ${index + 1}: ${fullSubId}`);
-                });
-              }
-            });
-          });
-
-          // Wait for collection to complete
-          cy.wait(2000);
-
-          // Log missing subscription types
-          cy.then(() => {
-            if (consumableIndex === -1) {
-              cy.log('⚠ consumable type subscription is missing');
-            }
-            if (normalIndex === -1) {
-              cy.log('⚠ normal type subscription is missing');
-            }
-            if (digitalIndex === -1) {
-              cy.log('⚠ digital type subscription is missing');
-            }
-          });
-
-          // Create subscriptions for rows that need them (rows with "Create subscription" button)
-          cy.then(() => {
-            cy.log('--- Creating Subscriptions ---');
-
-            rows.forEach((row, index) => {
-              cy.wrap(row).find('button').then(($buttons) => {
-                const hasCreateButton = Array.from($buttons).some(btn =>
-                  btn.textContent.includes('Create subscription')
-                );
-
-                if (hasCreateButton) {
-                  cy.log(`Creating subscription for row ${index + 1}`);
-
-                  // Read subscription type from column 8
-                  cy.wrap(row).find('td').eq(8).invoke('text').then((subType) => {
-                    const subscriptionType = subType.trim().toLowerCase();
-                    cy.log(`Row ${index + 1} subscription type: ${subscriptionType}`);
-
-                  // Click Create Subscription button
-                  OrderDetailPage.clickCreateSubscriptionForRow(index);
-
-                  // Execute subscription creation flow (skip Generate/Add for digital)
-                  OrderDetailPage.createSubscriptionFlow(subscriptionType);
-
-                  // Get the subscription ID after creation from hyperlink
-                  cy.wrap(row).find('td').eq(0).find('a[href*="/subscriptions/"]').invoke('attr', 'href').then((href) => {
-                    const subscriptionId = href.split('/subscriptions/')[1];
-                    cy.log(`Created subscription with ID: ${subscriptionId}`);
-
-                    // Database Verification
-                    cy.log(`--- Database Verification for ${subscriptionId} ---`);
-
-                    // Verify subscription exists in database and get the id
-                    cy.task('queryDb', SubscriptionQueries.getSubscriptionById(subscriptionId)).then((subscriptions) => {
-                      if (subscriptions && subscriptions.length > 0) {
-                        cy.log(`✓ Verified: Subscription ${subscriptionId} exists in database`);
-                        const sub = subscriptions[0];
-                        const dbSubscriptionId = sub.id; // This is the id from subscriptions table
-                        cy.log(`  - DB ID: ${dbSubscriptionId}`);
-                        cy.log(`  - Order ID: ${sub.order_id}`);
-                        cy.log(`  - Status: ${sub.subscription_status}`);
-                        cy.log(`  - Type: ${sub.subscription_type}`);
-
-                        // Check recurring payments using the id from subscriptions table
-                        cy.task('queryDb', SubscriptionQueries.hasRecurringPayments(dbSubscriptionId)).then((recurringPayments) => {
-                          if (recurringPayments && recurringPayments.length > 0) {
-                            cy.log(`✓ Verified: Subscription has recurring payments enabled`);
-                          } else {
-                            cy.log(`⚠ Info: Subscription does not have recurring payments enabled yet`);
-                          }
-                        });
-                      } else {
-                        cy.log(`⚠ Warning: Subscription ${subscriptionId} not found in database`);
-                      }
-                    });
-                  });
-
-                  cy.wait(2000);
-                  }); // end cy.wrap(row).find('td').eq(8)
-                }
               });
             });
+
+            cy.wait(2000);
           });
         });
-
-        cy.log('✓ Verified: All tests completed successfully');
-      } else {
-        cy.log('⚠ Warning: No order found matching the criteria');
-        throw new Error('No order found for testing');
-      }
+      });
     });
+
+    cy.log('✓ Test 3 Completed: Subscriptions created and verified in DB');
   });
 });

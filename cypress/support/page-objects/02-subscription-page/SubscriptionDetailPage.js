@@ -30,79 +30,79 @@ class SubscriptionDetailPage {
 
   // ==================== MENU ITEMS ====================
 
-  // Action - Auto-renew subscription
+  // Action
   clickAutoRenewSubscription() {
     cy.contains('[role="menuitem"]', 'Auto-renew subscription').click();
     cy.log('✓ Verified: Clicked Auto-renew subscription');
   }
 
-  // Action - Buyout subscription
+  // Action
   clickBuyoutSubscription() {
     cy.contains('[role="menuitem"]', 'Buyout subscription').click();
     cy.log('✓ Verified: Clicked Buyout subscription');
   }
 
-  // Action - Change quantity
+  // Action
   clickChangeQuantity() {
     cy.contains('[role="menuitem"]', 'Change quantity').click();
     cy.log('✓ Verified: Clicked Change quantity');
   }
 
-  // Action - Change billing frequency
+  // Action
   clickChangeBillingFrequency() {
     cy.contains('[role="menuitem"]', 'Change billing frequency').click();
     cy.log('✓ Verified: Clicked Change billing frequency');
   }
 
-  // Action - Change subscription attributes
+  // Action
   clickChangeSubscriptionAttributes() {
     cy.contains('[role="menuitem"]', 'Change subscription attributes').click();
     cy.log('✓ Verified: Clicked Change subscription attributes');
   }
 
-  // Action - Change subscription extension price
+  // Action
   clickChangeExtensionPrice() {
     cy.contains('[role="menuitem"]', 'Change subscription extension price').click();
     cy.log('✓ Verified: Clicked Change subscription extension price');
   }
 
-  // Action - Extend subscription
+  // Action
   clickExtendSubscription() {
     cy.contains('[role="menuitem"]', 'Extend subscription').click();
     cy.log('✓ Verified: Clicked Extend subscription');
   }
 
-  // Action - Reactivate subscription
+  // Action
   clickReactivateSubscription() {
     cy.contains('[role="menuitem"]', 'Reactivate subscription').click();
     cy.log('✓ Verified: Clicked Reactivate subscription');
   }
 
-  // Action - Replace serial number
+  // Action
   clickReplaceSerialNumber() {
     cy.contains('[role="menuitem"]', 'Replace serial number').click();
     cy.log('✓ Verified: Clicked Replace serial number');
   }
 
-  // Action - Set as pending return
+  // Action
   clickSetAsPendingReturn() {
     cy.contains('[role="menuitem"]', 'Set as pending return').click();
     cy.log('✓ Verified: Clicked Set as pending return');
   }
 
-  // Action - Set as ended
+  // Action
   clickSetAsEnded() {
     cy.contains('[role="menuitem"]', 'Set as ended').click();
     cy.log('✓ Verified: Clicked Set as ended');
   }
 
-  // Action - Swap subscription item
+  // Action
   clickSwapSubscriptionItem() {
     cy.contains('[role="menuitem"]', 'Swap subscription item').click();
     cy.log('✓ Verified: Clicked Swap subscription item');
   }
 
-  // Action - View order
+  // Action
   clickViewOrder() {
     cy.contains('[role="menuitem"]', 'View order').click();
     cy.log('✓ Verified: Clicked View order');
@@ -133,7 +133,7 @@ class SubscriptionDetailPage {
     return cy.get('[data-cy="btn-submit"]');
   }
 
-  // Action - click modal submit (Disable / Enable / Confirm etc.)
+  // Action
   clickModalSubmit() {
     this.modalSubmitButton.click();
     cy.log('✓ Verified: Clicked modal Submit button');
@@ -144,7 +144,7 @@ class SubscriptionDetailPage {
     return cy.get('[data-cy="btn-close"]');
   }
 
-  // Action - close modal using data-cy btn-close
+  // Action
   clickModalClose() {
     this.modalCloseButton.click();
     cy.wait(1000);
@@ -156,7 +156,7 @@ class SubscriptionDetailPage {
     return cy.contains('button', 'Close');
   }
 
-  // Action - close modal using semantic Close button text
+  // Action
   clickClose() {
     this.closeButton.click();
     cy.wait(3000);
@@ -205,7 +205,7 @@ class SubscriptionDetailPage {
 
   // ==================== MODAL STATE ====================
 
-  // Action - wait for HeadlessUI dialog panel open animation to complete
+  // Action
   // The dialog uses opacity: 0 → 1 transition; we wait until it is no longer opacity:0
   waitForModalOpen() {
     cy.get('[id^="headlessui-dialog-panel"]')
@@ -221,14 +221,14 @@ class SubscriptionDetailPage {
     return cy.get('button[aria-label="Auto renew"]');
   }
 
-  // Action - verify auto-renew toggle state
+  // Action
   verifyAutoRenewToggle(expectedState) {
     // expectedState: 'true' (enabled) or 'false' (disabled)
     this.autoRenewToggle.should('have.attr', 'aria-checked', expectedState);
     cy.log(`✓ Verified: Auto-renew toggle aria-checked is "${expectedState}"`);
   }
 
-  // Action - verify auto-renew modal content and disable it
+  // Action
   verifyAutoRenewDisableModal() {
     this.waitForModalOpen();
     cy.contains('Auto renew subscription').should('be.visible');
@@ -239,7 +239,7 @@ class SubscriptionDetailPage {
     cy.log('✓ Verified: Disable auto-renew modal content is correct');
   }
 
-  // Action - verify auto-renew modal content and enable it
+  // Action
   verifyAutoRenewEnableModal() {
     this.waitForModalOpen();
     cy.contains('Auto renew subscription').should('be.visible');
@@ -250,7 +250,7 @@ class SubscriptionDetailPage {
     cy.log('✓ Verified: Enable auto-renew modal content is correct');
   }
 
-  // Action - verify success modal appears and close it
+  // Action
   verifyAndCloseSuccessModal() {
     cy.contains('Successfully requested!').should('be.visible');
     cy.log('✓ Verified: Success confirmation modal appeared');
@@ -271,7 +271,7 @@ class SubscriptionDetailPage {
     return cy.get('[data-cy="interval"] input').filter(':visible').first();
   }
 
-  // Action - verify billing frequency modal content
+  // Action
   verifyChangeBillingFrequencyModal() {
     this.waitForModalOpen();
     cy.contains('Change billing frequency').should('be.visible');
@@ -282,7 +282,7 @@ class SubscriptionDetailPage {
     cy.log('✓ Verified: Change billing frequency modal content is correct');
   }
 
-  // Action - verify subscription_frequency_interval in DB matches expected value
+  // Action
   verifyBillingFrequencyInDb(subscriptionId, expectedInterval) {
     cy.wait(3000);
     cy.task('queryDb', SubscriptionWorkflowQueries.verifyBillingFrequencyInterval(subscriptionId, expectedInterval)).then((result) => {
@@ -293,7 +293,7 @@ class SubscriptionDetailPage {
     });
   }
 
-  // Action - read current interval from DB, toggle it (if 1 → set 2, if not 1 → set 1), save, verify DB
+  // Action
   updateBillingFrequency(subscriptionId) {
     cy.task('queryDb', SubscriptionWorkflowQueries.getCurrentBillingFrequencyInterval(subscriptionId)).then((rows) => {
       const currentVal = String(rows[0].subscription_frequency_interval);
@@ -325,19 +325,19 @@ class SubscriptionDetailPage {
     return cy.get('input[path="quantity"]').filter(':visible').first();
   }
 
-  // Action - set subscription_type = 'consumable' and quantity = 2 in DB before test
+  // Action
   setupQuantityTestInDb(subscriptionId) {
     cy.task('queryDb', SubscriptionWorkflowQueries.setupSubscriptionForQuantityTest(subscriptionId));
     cy.log(`✓ DB Setup: subscription_type = 'consumable', quantity = 2 for ${subscriptionId}`);
   }
 
-  // Action - revert subscription_type back to 'normal' and quantity = 2 in DB after test
+  // Action
   revertQuantityTestInDb(subscriptionId) {
     cy.task('queryDb', SubscriptionWorkflowQueries.revertSubscriptionAfterQuantityTest(subscriptionId));
     cy.log(`✓ DB Reverted: subscription_type = 'normal', quantity = 2 for ${subscriptionId}`);
   }
 
-  // Action - verify modal, set quantity, save, verify success modal closes
+  // Action
   changeQuantity(qty) {
     this.waitForModalOpen();
     cy.contains('Change quantity').should('be.visible');
@@ -357,7 +357,7 @@ class SubscriptionDetailPage {
     cy.contains('Successfully requested!').should('not.exist');
   }
 
-  // Action - verify subscription quantity in database
+  // Action
   verifyQuantityInDb(subscriptionId, expectedQty) {
     cy.wait(3000);
     cy.task('queryDb', SubscriptionWorkflowQueries.verifySubscriptionQuantity(subscriptionId, expectedQty)).then((result) => {
@@ -375,7 +375,7 @@ class SubscriptionDetailPage {
     return cy.get('input[data-cy="subscription-duration"]').filter(':visible').first();
   }
 
-  // Action - verify change subscription attributes modal content
+  // Action
   verifyChangeSubscriptionAttributesModal() {
     this.waitForModalOpen();
     cy.contains('Change subscription attributes').should('be.visible');
@@ -395,7 +395,7 @@ class SubscriptionDetailPage {
     return cy.contains('button', 'Submit').filter(':visible');
   }
 
-  // Action - set subscription length to 12 and installment unit price to 22, then submit
+  // Action
   updateSubscriptionAttributes() {
     // Update subscription length
     this.subscriptionLengthInput.clear().type('12');
@@ -420,7 +420,7 @@ class SubscriptionDetailPage {
     return cy.get('[data-cy="price"]');
   }
 
-  // Action - verify buyout price input is pre-filled with expected value
+  // Action
   verifyBuyoutPricePreFilled(expectedValue) {
     this.buyoutPriceInput.should('have.value', expectedValue);
     cy.log(`✓ Verified: Buyout price field is pre-filled with ${expectedValue}`);
@@ -431,14 +431,14 @@ class SubscriptionDetailPage {
     return cy.get('[data-test-id="input-invoice-reference"]');
   }
 
-  // Action - enter invoice line item text
+  // Action
   // Uses .filter(':visible').first() to target only the visible input when multiple matches exist
   enterInvoiceLineItemText(text) {
     this.invoiceLineItemInput.filter(':visible').first().click().type(text);
     cy.log(`✓ Filled: Invoice line item text with "${text}"`);
   }
 
-  // Action - verify buyout modal content and pricing rows
+  // Action
   verifyBuyoutModal() {
     this.waitForModalOpen();
     cy.contains('Buyout subscription').should('be.visible');
@@ -452,7 +452,7 @@ class SubscriptionDetailPage {
     cy.log('✓ Verified: Buyout modal content is correct');
   }
 
-  // Action - verify pricing row values in buyout modal
+  // Action
   verifyBuyoutPricingValues(retailPrice, prepaidPrice, paidByRecurring) {
     cy.contains(retailPrice).should('be.visible');
     cy.contains(prepaidPrice).should('be.visible');
@@ -460,7 +460,7 @@ class SubscriptionDetailPage {
     cy.log('✓ Verified: Buyout pricing rows display correct values');
   }
 
-  // Action - verify subscription buyout status in database (bought out or pending buyout)
+  // Action
   verifyBuyoutStatusInDb(subscriptionId) {
     cy.task('queryDb', SubscriptionWorkflowQueries.verifyBuyoutStatus(subscriptionId)).then((result) => {
       expect(result, 'Buyout status DB result should not be empty').to.have.length.greaterThan(0);
@@ -492,7 +492,7 @@ class SubscriptionDetailPage {
 
   // ==================== RECURRING PAYMENTS SECTION ====================
 
-  // Action - set items per page in the Recurring Payments section
+  // Action
   setRPItemsPerPage(size) {
     cy.contains('p', 'Recurring payments').scrollIntoView();
     cy.contains('p', 'Recurring payments')
@@ -510,7 +510,7 @@ class SubscriptionDetailPage {
     cy.log(`✓ Recurring Payments items per page set to ${size}`);
   }
 
-  // Action - find the RP row by its Recurring ID and open its 3-dot menu
+  // Action
   // Anchors to the table via its unique "Recurring ID" column header,
   // then clicks the last button[role="button"] (the 3-dot) in the matching row.
   // Waits for HeadlessUI dropdown animation to complete before returning.
@@ -528,13 +528,13 @@ class SubscriptionDetailPage {
     cy.log(`✓ Opened 3-dot menu for Recurring Payment ID: ${rpId}`);
   }
 
-  // Action - click "Delete recurring payment" from the currently open dropdown
+  // Action
   clickDeleteRecurringPayment() {
     cy.contains('Delete recurring payment').click();
     cy.log('✓ Clicked Delete recurring payment');
   }
 
-  // Action - complete the Delete RP confirmation dialog:
+  // Action
   // clicks "I understand the consequences." label text to check the checkbox, then clicks Submit
   confirmDeleteRecurringPayment() {
     cy.contains('I understand the consequences.').click();
@@ -543,7 +543,7 @@ class SubscriptionDetailPage {
     cy.log('✓ Confirmed: Delete recurring payment dialog submitted');
   }
 
-  // Action - verify success message and close the dialog
+  // Action
   // @param {string} context - label used in the log (e.g. 'Delete recurring payment', 'Mark as settled')
   closeSuccessDialog(context = 'action') {
     cy.contains('Successfully requested!').should('be.visible');
@@ -552,13 +552,13 @@ class SubscriptionDetailPage {
     cy.log(`✓ Closed: ${context} success dialog`);
   }
 
-  // Action - Charge recurring payment
+  // Action
   clickChargeRecurringPayment() {
     cy.contains('Charge recurring payment').click();
     cy.log('✓ Clicked Charge recurring payment');
   }
 
-  // Action - complete the Charge RP confirmation dialog:
+  // Action
   // clicks "I understand the consequences." to check the checkbox, then clicks Submit
   confirmChargeRecurringPayment() {
     cy.contains('I understand the consequences.').click();
@@ -567,7 +567,7 @@ class SubscriptionDetailPage {
     cy.log('✓ Confirmed: Charge recurring payment dialog submitted');
   }
 
-  // Action - verify the Charge RP specific success message and close the dialog
+  // Action
   // The Charge RP action shows "Your invoice was generated successfully!" (different from other RPs)
   closeChargeSuccessDialog() {
     cy.contains('Your invoice was generated successfully!').should('be.visible');
@@ -576,20 +576,20 @@ class SubscriptionDetailPage {
     cy.log('✓ Closed: Charge recurring payment success dialog');
   }
 
-  // Action - Edit recurring payment(s)
+  // Action
   clickEditRecurringPayments() {
     cy.contains('Edit recurring payment(s)').click();
     cy.log('✓ Clicked Edit recurring payment(s)');
   }
 
-  // Action - click the "Change all future payments" checkbox in the Edit RP dialog
+  // Action
   // Selector uses aria-label which is stable and unique to this checkbox
   clickChangeAllFuturePayments() {
     cy.get('input[aria-label="Change all future payments"]').click();
     cy.log('✓ Checked: Change all future payments');
   }
 
-  // Action - clear the Item Amount field and enter a new amount value
+  // Action
   // Anchors via the "Item Amount" label inside .v-field__field to avoid ambiguity with other inputs
   enterItemAmount(amount) {
     cy.contains('.v-label', 'Item Amount')
@@ -600,32 +600,32 @@ class SubscriptionDetailPage {
     cy.log(`✓ Entered Item Amount: ${amount}`);
   }
 
-  // Action - click the "Submit changes" button in the Edit RP dialog
+  // Action
   clickSubmitChanges() {
     this.submitChangesButton.should('not.be.disabled').click();
     cy.log('✓ Clicked Submit changes');
   }
 
-  // Action - Mark as not paid
+  // Action
   clickMarkAsNotPaid() {
     cy.contains('Mark as not paid').click();
     cy.log('✓ Clicked Mark as not paid');
   }
 
-  // Action - complete the Mark as not paid confirmation dialog: clicks "Mark as not paid" button
+  // Action
   confirmMarkAsNotPaid() {
     cy.wait(2000);
     cy.contains('button', 'Mark as not paid').should('not.be.disabled').click();
     cy.log('✓ Confirmed: Mark as not paid dialog submitted');
   }
 
-  // Action - Mark as settled
+  // Action
   clickMarkAsSettled() {
     cy.contains('Mark as settled').click();
     cy.log('✓ Clicked Mark as settled');
   }
 
-  // Action - complete the Mark as settled confirmation dialog: clicks the "Mark as settled" button
+  // Action
   confirmMarkAsSettled() {
     cy.wait(2000);
     cy.contains('button', 'Mark as settled').should('not.be.disabled').click();

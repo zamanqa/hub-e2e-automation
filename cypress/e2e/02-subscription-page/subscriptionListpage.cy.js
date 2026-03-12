@@ -1,5 +1,5 @@
-import SubscriptionListPage from '../../support/page-objects/SubscriptionListPage';
-import SubscriptionWorkflowQueries from '../../support/helpers/subscription-workflow-queries';
+import SubscriptionListPage from '../../support/page-objects/02-subscription-page/SubscriptionListPage';
+import SubscriptionWorkflowQueries from '../../support/helpers/02-subscription-page/subscription-workflow-queries';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Describe: Subscription List - Filters, Export & Pagination

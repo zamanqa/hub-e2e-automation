@@ -1,5 +1,5 @@
-import { ReturnsPage, RepairsPage } from '../../support/page-objects/ReturnAndRepairPage';
-import ReturnRepairQueries from '../../support/helpers/return-repair-queries';
+import { ReturnsPage, RepairsPage } from '../../support/page-objects/05-repair-and-return/ReturnAndRepairPage';
+import ReturnRepairQueries from '../../support/helpers/05-repair-and-return/return-repair-queries';
 
 describe('Circuly CMS – Return and Repair Workflow', () => {
   // Shared across all three tests — fetched once in before()

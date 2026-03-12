@@ -1,6 +1,6 @@
-import OrderListPage from '../../support/page-objects/OrderListPage';
-import OrderWorkflowPage from '../../support/page-objects/OrderWorkflowPage';
-import OrderWorkflowQueries from '../../support/helpers/order-workflow-queries';
+import OrderListPage from '../../support/page-objects/01-order-page/OrderListPage';
+import OrderWorkflowPage from '../../support/page-objects/01-order-page/OrderWorkflowPage';
+import OrderWorkflowQueries from '../../support/helpers/01-order-page/order-workflow-queries';
 
 describe('Order Management Workflow - E2E Tests', () => {
   let testOrderId;

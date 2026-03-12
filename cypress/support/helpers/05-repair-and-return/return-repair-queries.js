@@ -46,29 +46,6 @@ class ReturnRepairQueries {
     `;
   }
 
-  // ==================== REPAIRS QUEUE LOOKUP ====================
-
-  /**
-   * Find a serial number already sitting in the repairs queue.
-   * Used by Test 2 when running standalone (it.only) — after Test 1
-   * has already marked an item as returned, its location_status flips
-   * to 'to repair' in product_trackings.
-   *
-   * Returns: serial_number
-   */
-  getSerialNumberFromRepairsQueue() {
-    return `
-      SELECT pt.serial_number
-      FROM public.product_trackings pt
-      LEFT JOIN general_company_settings gcs ON pt.company_id = gcs.uid
-      WHERE gcs.name IN ('${Cypress.env('circuly_shopify_stripe')}')
-        AND pt.location_status = 'to repair'
-        AND pt.serial_number IS NOT NULL
-      ORDER BY pt.updated_at DESC
-      LIMIT 1
-    `;
-  }
-
   // ==================== PRODUCT TRACKING VERIFICATION ====================
 
   /**

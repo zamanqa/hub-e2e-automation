@@ -7,7 +7,7 @@
  */
 
 import CronPage from '../../support/page-objects/CronPage';
-import CronQueries from '../../support/helpers/cron-queries';
+import CronQueries from '../../support/helpers/03-cron/cron-queries';
 
 // ==================== DATE HELPERS ====================
 

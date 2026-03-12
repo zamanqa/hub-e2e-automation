@@ -27,12 +27,12 @@ class OrderDetailPage {
     cy.log('✓ Verified: Clicked Create Note button');
   }
 
-  // Selector for the note message textarea (stable class selector)
+  // Selector
   get noteMessageInput() {
     return cy.get('textarea[path="message"]');
   }
 
-  // Action to enter a note message
+  // Action
   enterNoteMessage(message) {
     this.noteMessageInput.click({ force: true });
     this.noteMessageInput.clear({ force: true });
@@ -161,9 +161,6 @@ class OrderDetailPage {
     if (subscriptionType !== 'digital') {
       // Click Generate
       this.clickGenerate();
-
-      // Click Add
-      //this.clickAdd();
     }
 
     // Click Submit
