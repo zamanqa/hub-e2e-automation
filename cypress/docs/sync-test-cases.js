@@ -28,11 +28,11 @@ const E2E_DIR   = path.join(ROOT, 'cypress', 'e2e');
 
 // ── Tab → folder mapping (order must match the TABS array in HTML) ──────────
 const TAB_MAP = [
-  { id: 'orders',        folder: '01-order-page'        },
-  { id: 'subscriptions', folder: '02-subscription-page' },
-  { id: 'cron',          folder: '03-cron'              },
-  { id: 'invoices',      folder: '04-invoice-page'      },
-  { id: 'repair-return', folder: '05-repair-and-return' },
+  { id: 'orders',           folder: '01-order-page'        },
+  { id: 'subscriptions',    folder: '02-subscription-page' },
+  { id: 'cron',             folder: '03-cron'              },
+  { id: 'invoices',         folder: '04-invoice-page'      },
+  { id: 'repair-return',    folder: '05-repair-and-return' },
 ];
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
