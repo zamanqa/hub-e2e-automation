@@ -1,4 +1,4 @@
-import SubscriptionWorkflowQueries from '../helpers/subscription-workflow-queries';
+import SubscriptionWorkflowQueries from '../../helpers/02-subscription-page/subscription-workflow-queries';
 
 /**
  * Subscription Detail Page Object
