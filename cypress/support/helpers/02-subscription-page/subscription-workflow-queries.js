@@ -30,7 +30,8 @@ class SubscriptionWorkflowQueries {
         AND o.origin = 'checkout'
         AND s.subscription_type IN ('normal')
         AND s.status IN ('active')
-        AND s.subscription_duration > 5
+        AND s.subscription_duration > 3
+        AND s.subscription_id NOT IN (SELECT parent_id FROM subscriptions WHERE parent_id IS NOT NULL)
       ORDER BY s.created_at DESC
       LIMIT 1 OFFSET 1
     `;

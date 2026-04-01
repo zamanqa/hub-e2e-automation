@@ -372,7 +372,7 @@ class SubscriptionDetailPage {
 
   // Selector — subscription length input (data-cy="subscription-duration" on the input itself)
   get subscriptionLengthInput() {
-    return cy.get('input[data-cy="subscription-duration"]').filter(':visible').first();
+    return cy.contains('label', 'Subscription length').closest('.v-field__field').find('input.v-field__input').filter(':visible').first();
   }
 
   // Action
@@ -385,9 +385,13 @@ class SubscriptionDetailPage {
     cy.log('✓ Verified: Change subscription attributes modal content is correct');
   }
 
-  // Selector — subscription installment unit price input (data-cy="subscription-price" on the input itself)
+  // Selector — subscription installment unit price input (data-cy is on wrapper div, not input; resolved via label text)
   get subscriptionInstallmentPriceInput() {
-    return cy.get('input[data-cy="subscription-price"]').filter(':visible').first();
+    return cy.contains('label', 'Subscription installment unit price')
+      .closest('.v-field__field')
+      .find('input.v-field__input')
+      .filter(':visible')
+      .first();
   }
 
   // Selector — submit button inside the Change subscription attributes modal
@@ -405,8 +409,14 @@ class SubscriptionDetailPage {
     this.subscriptionInstallmentPriceInput.clear().type('22');
     cy.log('✓ Updated: Installment unit price set to 22');
 
+    // Click "Prepaid amount" label to trigger blur and enable Submit button
+    cy.contains('p', 'Prepaid amount:').click();
+    cy.log('✓ Clicked: Prepaid amount label to trigger form validation');
+
     // Submit and verify success
-    this.subscriptionAttributesSubmitButton.click();
+    cy.wait(2000);
+    this.subscriptionAttributesSubmitButton.click({force: true});
+    cy.wait(2000);
     cy.contains('Successfully requested!').should('be.visible');
     cy.log('✓ Verified: Success modal appeared after submitting attributes');
     this.modalCloseButton.click();

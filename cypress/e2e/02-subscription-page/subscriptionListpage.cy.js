@@ -191,7 +191,7 @@ describe('Subscription List - Filters, Export & Pagination', () => {
     });
 
     // ── Test 6c: Navigate directly to the last page ────────────────────────────
-    it.only('Test 6c: should navigate directly to the last page', () => {
+    it('Test 6c: should navigate directly to the last page', () => {
       cy.log('========== Test 6c: Last Page Navigation ==========');
 
       SubscriptionListPage.paginationText.invoke('text').then((text) => {
@@ -224,7 +224,7 @@ describe('Subscription List - Filters, Export & Pagination', () => {
     });
 
     // ── Test 6d: Change items per page size ────────────────────────────────────
-    it.only('Test 6d: should change items per page size', () => {
+    it('Test 6d: should change items per page size', () => {
       cy.log('========== Test 6d: Change Page Size ==========');
 
       // Change to 25 items per page
@@ -246,7 +246,7 @@ describe('Subscription List - Filters, Export & Pagination', () => {
     });
 
     // ── Test 6e: Record count stays consistent across pages after filtering ────
-    it.only('Test 6e: should maintain correct record count after filtering + pagination', () => {
+    it('Test 6e: should maintain correct record count after filtering + pagination', () => {
       cy.log('========== Test 6e: Record Count Consistency After Filter + Paginate ==========');
 
       // Apply Status = Active filter

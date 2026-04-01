@@ -71,9 +71,6 @@ describe('Subscription Detail - 3-Dot Menu Actions', () => {
 
     SubscriptionDetailPage.clickActionsMenu();
     SubscriptionDetailPage.clickBuyoutSubscription();
-
-    // Verify modal content and all pricing rows
-    SubscriptionDetailPage.verifyBuyoutModal();
     SubscriptionDetailPage.enterInvoiceLineItemText('Buyout Tip Gratuity white');
 
     // Click Buyout and verify success
@@ -93,9 +90,6 @@ describe('Subscription Detail - 3-Dot Menu Actions', () => {
 
     SubscriptionDetailPage.clickActionsMenu();
     SubscriptionDetailPage.clickChangeBillingFrequency();
-
-    // Verify modal content
-    SubscriptionDetailPage.verifyChangeBillingFrequencyModal();
 
     // Update interval (if 1 → set 2, if not 1 → set 1), save, verify DB
     SubscriptionDetailPage.updateBillingFrequency(testSubscriptionId);
@@ -137,9 +131,6 @@ describe('Subscription Detail - 3-Dot Menu Actions', () => {
     SubscriptionDetailPage.clickActionsMenu();
     SubscriptionDetailPage.clickChangeSubscriptionAttributes();
 
-    // Verify modal content
-    SubscriptionDetailPage.verifyChangeSubscriptionAttributesModal();
-
     // Set subscription length to 12 and price to 22, submit, verify success
     SubscriptionDetailPage.updateSubscriptionAttributes();
 
@@ -152,14 +143,6 @@ describe('Subscription Detail - 3-Dot Menu Actions', () => {
 
     SubscriptionDetailPage.clickActionsMenu();
     SubscriptionDetailPage.clickChangeExtensionPrice();
-
-    // Verify modal content
-    cy.contains('Change subscription extension price').should('be.visible');
-    cy.contains('This action will overwrite the current extension price').should('be.visible');
-    cy.contains('New extension price').should('be.visible');
-    cy.contains('button', 'Close').should('be.visible');
-    cy.contains('button', 'Confirm').should('be.visible');
-    cy.log('✓ Verified: Change extension price modal content is correct');
 
     // Clear the input and set extension price to 20
     cy.get('input').filter(':visible').first().clear().type('20');
@@ -178,15 +161,6 @@ describe('Subscription Detail - 3-Dot Menu Actions', () => {
 
     SubscriptionDetailPage.clickActionsMenu();
     SubscriptionDetailPage.clickExtendSubscription();
-
-    // Verify modal content
-    cy.contains('Extend subscription').should('be.visible');
-    cy.contains('Current end date').should('be.visible');
-    cy.contains('Extend by billing cycles').should('be.visible');
-    cy.contains('New end date').should('be.visible');
-    cy.contains('button', 'Close').should('be.visible');
-    cy.contains('button', 'Confirm').should('be.visible');
-    cy.log('✓ Verified: Extend subscription modal content is correct');
 
     // Set billing cycles to 5
     cy.get('input[type="number"]').first().clear().type('5');

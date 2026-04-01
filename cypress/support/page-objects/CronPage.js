@@ -4,7 +4,7 @@
  * No UI selectors — this page object drives the Lumen backend API directly.
  */
 
-import CronQueries from '../helpers/cron-queries';
+import CronQueries from '../helpers/03-cron/cron-queries';
 
 const LUMEN_BASE_URL = 'https://circuly-lumen.herokuapp.com/v1';
 
