@@ -82,6 +82,7 @@ class CronQueries {
         SELECT
           s.subscription_id,
           s.company_id,
+          s.created_at,
           r.id,
           ROW_NUMBER() OVER (PARTITION BY s.subscription_id ORDER BY r.id ASC) AS rn
         FROM subscriptions s
@@ -89,9 +90,10 @@ class CronQueries {
         LEFT JOIN general_company_settings gcs ON o.company_id = gcs.uid
         LEFT JOIN recurring_payments r ON r.subscription_id = s.id AND r.company_id = s.company_id
         WHERE gcs.name IN ('${Cypress.env('circuly_shopify_stripe')}')
-          AND o.payment_method_token IN ('offlinegateway','invoice')
+          AND o.payment_method_token IN ('visa','mastercard','card','paypal')
+          AND o.payment_provider IN ('stripe','mollie','adyen','braintree')
           AND o.status IN ('open','fulfilled')
-          AND o.origin IN ('checkout','cms')
+          AND o.origin IN ('checkout')
           AND s.subscription_type IN ('normal','consumable')
           AND s.status IN ('active')
           AND r.enabled = true
@@ -110,7 +112,8 @@ class CronQueries {
       WHERE rn <= 4
       GROUP BY subscription_id
       HAVING COUNT(id) >= 4
-      LIMIT 1 OFFSET 1
+      ORDER BY MAX(created_at) DESC
+      LIMIT 1
     `;
   }
 
