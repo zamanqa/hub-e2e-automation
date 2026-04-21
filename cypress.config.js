@@ -38,7 +38,7 @@ module.exports = defineConfig({
 
       // Login credentials
       testUserEmail: process.env.TEST_USER_EMAIL || 'super.admin@circuly.io',
-      testUserPassword: process.env.TEST_USER_PASSWORD || 'Pa$$word131152489',
+      testUserPassword: 'Pa$$word131152489',
 
       // Company IDs
       circuly_shopify_stripe: process.env.circuly_shopify_stripe || 'circuly shopify stripe',
