@@ -86,7 +86,7 @@ function titleMatches(diskTitle, existingTitle) {
   const longer  = wordsA.length <= wordsB.length ? wordsB : wordsA;
   if (shorter.length === 0) return false;
   const overlap = shorter.filter(w => longer.includes(w)).length;
-  if (overlap / shorter.length >= 0.6) return true;
+  if (overlap / shorter.length >= 0.75) return true;
   return false;
 }
 

@@ -37,7 +37,7 @@ describe('Order Management Workflow - E2E Tests', () => {
   });
 
   // ==================== Test 1: Create One-Time Payment ====================
-  it.only('Test 1: should create one-time payment successfully', () => {
+  it('Test 1: should create one-time payment successfully', () => {
     cy.log('========== Test 1: Create One-Time Payment ==========');
 
     // Click actions menu (three dots)

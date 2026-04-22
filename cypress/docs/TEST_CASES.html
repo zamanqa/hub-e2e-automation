@@ -506,11 +506,11 @@ const TABS = [
           { title: 'Order count matches between DB and UI', db: true },
           { title: 'Select multiple orders and export', db: false },
           { title: 'Search order from DB and mark as fulfilled', db: true },
-          { title: 'Pagination controls work', db: false },
           { title: 'Filter by Status = Open and verify URL parameter', db: false },
           { title: 'Filter by Payment Status = Paid and verify URL parameter', db: false },
           { title: 'Click Draft tab', db: false },
           { title: 'Click Consumable tab', db: false },
+          { title: 'Test 7: should test pagination controls', db: true },
         ]
       },
       {
@@ -530,7 +530,7 @@ const TABS = [
   {
     id: 'subscriptions',
     label: 'Subscriptions',
-    num: '26',
+    num: '27',
     files: [
       {
         name: '02-subscription-page/subscriptionDetail.cy.js',
@@ -563,6 +563,7 @@ const TABS = [
           { title: 'Test 5b: should navigate to the next page and back', db: true },
           { title: 'Test 6d: should change items per page size', db: true },
           { title: 'Test 6e: should maintain correct record count after filtering + pagination', db: true },
+          { title: 'Test 6c: should navigate directly to the last page', db: true },
         ]
       },
       {
@@ -573,7 +574,7 @@ const TABS = [
           { title: 'Mark RP2 as settled', db: true },
           { title: 'Mark RP3 as not paid', db: true },
           { title: 'Charge RP4 and verify invoice_id is set in DB', db: true },
-          { title: 'Edit RP1 item amount to 20 (change all future payments)', db: true },
+          { title: 'Test 5: should edit RP1 item amount to 20 and verify amount updated in DB', db: true },
         ]
       },
     ]
