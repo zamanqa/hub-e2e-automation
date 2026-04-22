@@ -28,9 +28,9 @@ class OrderWorkflowQueries {
       FROM orders o
       LEFT JOIN general_company_settings gcs ON o.company_id = gcs.uid
       WHERE gcs.name IN ('${companyName}')
-        AND o.status IN ('open')
-        AND o.payment_provider IN ('stripe')
-        AND o.payment_method_token IN ('visa')
+        AND o.payment_method_token IN ('visa','mastercard','card','paypal')
+        AND o.payment_provider IN ('stripe','mollie','adyen','braintree')
+        AND o.status IN ('open','fulfilled')
         AND o.transaction_id IS NULL
         AND o.payment_status IN ('payment_required')
         AND o.origin IN ('cms')

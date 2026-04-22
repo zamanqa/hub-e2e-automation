@@ -32,9 +32,9 @@ class ReturnRepairQueries {
       LEFT JOIN orders o ON o.order_id = s.order_id AND o.company_id = s.company_id
       LEFT JOIN general_company_settings gcs ON o.company_id = gcs.uid
       WHERE gcs.name IN ('${Cypress.env('circuly_shopify_stripe')}')
-        AND o.payment_provider = 'stripe'
-        AND o.payment_method_token = 'visa'
-        AND o.status = 'open'
+        AND o.payment_method_token IN ('visa','mastercard','card','paypal')
+        AND o.payment_provider IN ('stripe','mollie','adyen','braintree')
+        AND o.status IN ('open','fulfilled')
         AND o.origin = 'checkout'
         AND s.subscription_type IN ('normal')
         AND s.status IN ('active')

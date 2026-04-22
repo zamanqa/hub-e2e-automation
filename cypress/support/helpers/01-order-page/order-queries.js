@@ -64,12 +64,12 @@ class OrderQueries {
       LEFT JOIN subscriptions s ON o.order_id = s.order_id AND o.company_id = s.company_id
       WHERE gcs.name IN ('${companyName}')
         AND s.order_id IS NULL
-        AND o.payment_provider = 'stripe'
-        AND o.payment_method_token = 'visa'
-        AND o.status = 'open'
+        AND o.payment_method_token IN ('visa','mastercard','card','paypal')
+        AND o.payment_provider IN ('stripe','mollie','adyen','braintree')
+        AND o.status IN ('open','fulfilled')
         AND o.origin = 'checkout'
       ORDER BY o.created_at DESC
-      LIMIT 1 OFFSET 1
+      LIMIT 1
     `;
   }
 
