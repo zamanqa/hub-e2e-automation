@@ -17,6 +17,8 @@ describe('Order Detail Page', () => {
 
   beforeEach(() => {
     OrderListPage.navigateToOrderList();
+    cy.wait(5000)
+    OrderListPage.clearAllFilters();
     OrderListPage.searchByOrderId(testOrderId);
     OrderListPage.clickOnOrderFromList(testOrderId);
   });

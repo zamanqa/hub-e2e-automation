@@ -563,6 +563,8 @@ const TABS = [
           { title: 'Select all rows via header checkbox and export', db: false },
           { title: 'Test 5a: should display correct initial pagination state', db: true },
           { title: 'Test 5b: should navigate to the next page and back', db: true },
+          { title: 'Test 6d: should change items per page size', db: true },
+          { title: 'Test 6e: should maintain correct record count after filtering + pagination', db: true },
         ]
       },
       {
@@ -584,17 +586,17 @@ const TABS = [
     num: '03',
     files: [
       {
-        name: '03-cron/invoiceChargeProcess.cy.js',
-        spec: 'cypress/e2e/03-cron/invoiceChargeProcess.cy.js',
-        tests: [
-          { title: 'Trigger invoice charge cron and verify transaction statuses are non-pending', db: true },
-        ]
-      },
-      {
         name: '03-cron/recurringPaymentProcess.cy.js',
         spec: 'cypress/e2e/03-cron/recurringPaymentProcess.cy.js',
         tests: [
           { title: 'Process recurring payments end-to-end via cron and generate invoices', db: true },
+        ]
+      },
+      {
+        name: '03-cron/testInvoiceChargeProcess.cy.js',
+        spec: 'cypress/e2e/03-cron/testInvoiceChargeProcess.cy.js',
+        tests: [
+          { title: 'should trigger invoice charge cron and verify transaction statuses are non-pending', db: true },
         ]
       },
     ]

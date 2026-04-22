@@ -75,6 +75,7 @@ describe('Order Creation - Add Items with Different Subscription Types', () => {
     // ========== CREATE ORDER ==========
     cy.log('========== Creating Order ==========');
     OrderCreationPage.clickQuoteOrder();
+    cy.wait(5000)
     OrderCreationPage.verifyQuoteOrderCreated();
 
   });

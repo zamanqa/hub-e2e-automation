@@ -111,6 +111,7 @@ describe('Order List Page - Comprehensive Tests', () => {
 
     // Navigate to Order List page
     OrderListPage.navigateToOrderList();
+    OrderListPage.clearAllFilters();
 
     // Query database for 5th order without subscription
     cy.task('queryDb', OrderQueries.getFifthOrderWithoutSubscription()).then((orders) => {

@@ -4,7 +4,7 @@
   "description": "Cypress E2E automation for HUB application - Shopify platform",
   "main": "index.js",
   "scripts": {
-    "open": "node_modules\\.bin\\cypress open",
+    "open": "dotenv -e .env -- cypress open",
     "cy:run": "dotenv -e .env -- cypress run --record",
     "cy:run:chrome": "dotenv -e .env -- cypress run --browser chrome --record",
     "cy:health-check": "dotenv -e .env -- cypress run --config-file cypress.health-check.config.js --record",
