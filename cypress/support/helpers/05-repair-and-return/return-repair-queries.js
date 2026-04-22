@@ -42,7 +42,7 @@ class ReturnRepairQueries {
         AND s.subscription_duration > 5
         AND s.serial_number not in ('no-serial-number-found')
       ORDER BY s.created_at DESC
-      LIMIT 1 OFFSET 1
+      LIMIT 1
     `;
   }
 

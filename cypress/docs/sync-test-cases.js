@@ -6,10 +6,10 @@
  *
  * What it does:
  *   • Scans all *.cy.js files under cypress/e2e/
- *   • Compares it() blocks found on disk with the TABS array in the HTML
- *   • Appends new tests to existing files in the TABS array
- *   • Creates new file entries for brand-new test files
- *   • Never removes or overwrites existing test entries (preserves descriptions)
+ *   • Adds new test files and new it() blocks to the TABS array
+ *   • REMOVES entries for files that have been deleted or renamed
+ *   • REMOVES individual test entries whose it() titles no longer exist in the spec
+ *   • Auto-recalculates the tab badge count (num) for each tab
  *
  * Usage:
  *   node cypress/docs/sync-test-cases.js
@@ -58,6 +58,38 @@ function escJs(str) {
   return str.replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n');
 }
 
+// ── Fuzzy title matching (same logic used for add/remove) ────────────────────
+
+function normalizeTitle(t) {
+  let s = (t || '').trim().toLowerCase();
+  s = s.replace(/^test\s+\d+[a-z]?:\s*/i, '');  // strip "Test 1: ", "Test 5a: "
+  s = s.replace(/^\d+\.\s*/, '');                  // strip "1. "
+  s = s.replace(/^should\s+/, '');                  // strip "should "
+  return s;
+}
+
+function extractWords(s) {
+  return s.replace(/[^a-z0-9]+/g, ' ').trim().split(/\s+/).filter(w => w.length > 2);
+}
+
+function titleMatches(diskTitle, existingTitle) {
+  const a = normalizeTitle(diskTitle);
+  const b = normalizeTitle(existingTitle);
+  // Exact match
+  if (a === b) return true;
+  // Substring match
+  if (a.includes(b) || b.includes(a)) return true;
+  // Word overlap: if 60%+ of words in the shorter title appear in the longer one
+  const wordsA = extractWords(a);
+  const wordsB = extractWords(b);
+  const shorter = wordsA.length <= wordsB.length ? wordsA : wordsB;
+  const longer  = wordsA.length <= wordsB.length ? wordsB : wordsA;
+  if (shorter.length === 0) return false;
+  const overlap = shorter.filter(w => longer.includes(w)).length;
+  if (overlap / shorter.length >= 0.6) return true;
+  return false;
+}
+
 // ── Main ─────────────────────────────────────────────────────────────────────
 
 function sync() {
@@ -69,6 +101,7 @@ function sync() {
   let html    = fs.readFileSync(HTML_FILE, 'utf8');
   let changed = false;
   let added   = 0;
+  let removed = 0;
 
   // Find the TABS array in the HTML
   const tabsStart = html.indexOf('const TABS = [');
@@ -111,17 +144,30 @@ function sync() {
       continue;
     }
 
-    // All .cy.js files in this folder
+    // All .cy.js files currently on disk for this folder
     const diskFiles = fs.readdirSync(folderPath)
       .filter(f => f.endsWith('.cy.js'))
       .sort();
 
+    const diskSpecPaths = diskFiles.map(f => `cypress/e2e/${tabDef.folder}/${f}`);
+
+    // ── STEP 1: Remove file entries for files that no longer exist on disk ──
+    const beforeFileCount = tab.files.length;
+    tab.files = tab.files.filter(f => {
+      if (diskSpecPaths.includes(f.spec)) return true;
+      console.log(`  - Removed stale file entry: ${f.name}`);
+      changed = true;
+      removed++;
+      return false;
+    });
+
+    // ── STEP 2: Process each disk file ──────────────────────────────────────
     for (const fileName of diskFiles) {
-      const filePath = path.join(folderPath, fileName);
-      const specPath = `cypress/e2e/${tabDef.folder}/${fileName}`;
+      const filePath    = path.join(folderPath, fileName);
+      const specPath    = `cypress/e2e/${tabDef.folder}/${fileName}`;
       const displayName = `${tabDef.folder}/${fileName}`;
-      const titles   = extractItTitles(filePath);
-      const hasDb    = usesDbQuery(filePath);
+      const titles      = extractItTitles(filePath);
+      const hasDb       = usesDbQuery(filePath);
 
       // Find existing file entry in TABS
       const existingFile = tab.files.find(f => f.spec === specPath);
@@ -129,50 +175,29 @@ function sync() {
       if (!existingFile) {
         // ── Brand-new file — add entire entry ──
         tab.files.push({
-          name: displayName,
-          spec: specPath,
+          name:  displayName,
+          spec:  specPath,
           tests: titles.map(t => ({ title: t, db: hasDb })),
         });
         changed = true;
-        added += titles.length;
+        added  += titles.length;
         console.log(`  + New file: ${displayName}  (${titles.length} tests)`);
         continue;
       }
 
-      // ── Existing file — check for new it() blocks ──
-      // Use fuzzy matching: a disk title matches an existing title if either
-      // contains the other (case-insensitive), after stripping "Test N:" prefix
-      // and "should " prefix for comparison.
-      function normalizeTitle(t) {
-        let s = (t || '').trim().toLowerCase();
-        s = s.replace(/^test\s+\d+[a-z]?:\s*/i, '');  // strip "Test 1: ", "Test 5a: "
-        s = s.replace(/^\d+\.\s*/, '');                  // strip "1. "
-        s = s.replace(/^should\s+/, '');                  // strip "should "
-        return s;
-      }
+      // ── STEP 3: Remove tests that no longer exist in the spec ──
+      const beforeTestCount = existingFile.tests.length;
+      existingFile.tests = existingFile.tests.filter(et => {
+        const stillExists = titles.some(diskTitle => titleMatches(diskTitle, et.title));
+        if (!stillExists) {
+          console.log(`  - Removed deleted test from ${displayName}: "${et.title}"`);
+          changed = true;
+        }
+        return stillExists;
+      });
+      removed += beforeTestCount - existingFile.tests.length;
 
-      function extractWords(s) {
-        return s.replace(/[^a-z0-9]+/g, ' ').trim().split(/\s+/).filter(w => w.length > 2);
-      }
-
-      function titleMatches(diskTitle, existingTitle) {
-        const a = normalizeTitle(diskTitle);
-        const b = normalizeTitle(existingTitle);
-        // Exact match
-        if (a === b) return true;
-        // Substring match
-        if (a.includes(b) || b.includes(a)) return true;
-        // Word overlap: if 60%+ of words in the shorter title appear in the longer one
-        const wordsA = extractWords(a);
-        const wordsB = extractWords(b);
-        const shorter = wordsA.length <= wordsB.length ? wordsA : wordsB;
-        const longer  = wordsA.length <= wordsB.length ? wordsB : wordsA;
-        if (shorter.length === 0) return false;
-        const overlap = shorter.filter(w => longer.includes(w)).length;
-        if (overlap / shorter.length >= 0.6) return true;
-        return false;
-      }
-
+      // ── STEP 4: Add new it() blocks not already present ─────────────────
       const newTitles = titles.filter(diskTitle => {
         return !existingFile.tests.some(et => titleMatches(diskTitle, et.title));
       });
@@ -181,8 +206,8 @@ function sync() {
         newTitles.forEach(t => {
           existingFile.tests.push({ title: t, db: hasDb });
         });
-        changed = true;
-        added += newTitles.length;
+        changed  = true;
+        added   += newTitles.length;
         console.log(`  + ${displayName}: +${newTitles.length} new test(s) (${existingFile.tests.length - newTitles.length} → ${existingFile.tests.length})`);
       } else {
         console.log(`  ✓ ${displayName}: ${existingFile.tests.length} tests — up to date`);
@@ -191,32 +216,39 @@ function sync() {
   }
 
   if (changed) {
-    // Rebuild the TABS array source
+    // Rebuild the TABS array source (num is auto-calculated from actual test count)
     const newTabsSource = buildTabsSource(tabs);
     const newHtml = html.slice(0, tabsStart) + 'const TABS = ' + newTabsSource + html.slice(tabsEnd);
 
     fs.writeFileSync(HTML_FILE, newHtml, 'utf8');
-    console.log(`\n✅  TEST_CASES.html updated — ${added} new test case(s) added`);
+    const summary = [];
+    if (added)   summary.push(`${added} added`);
+    if (removed) summary.push(`${removed} removed`);
+    console.log(`\n✅  TEST_CASES.html updated — ${summary.join(', ')}`);
   } else {
     console.log('\n✅  TEST_CASES.html is already up to date — no changes needed');
   }
 }
 
-/** Rebuild the TABS array as formatted JavaScript source. */
+/** Rebuild the TABS array as formatted JavaScript source.
+ *  num is auto-computed from the actual total tests in that tab. */
 function buildTabsSource(tabs) {
   let out = '[\n';
-  tabs.forEach((tab, tIdx) => {
+  tabs.forEach((tab) => {
+    // Auto-calculate the badge count from actual tests
+    const count = tab.files.reduce((s, f) => s + f.tests.length, 0);
+
     out += '  {\n';
     out += `    id: '${escJs(tab.id)}',\n`;
     out += `    label: '${escJs(tab.label)}',\n`;
-    out += `    num: '${escJs(tab.num)}',\n`;
+    out += `    num: '${count}',\n`;
     out += '    files: [\n';
-    tab.files.forEach((file, fIdx) => {
+    tab.files.forEach((file) => {
       out += '      {\n';
       out += `        name: '${escJs(file.name)}',\n`;
       out += `        spec: '${escJs(file.spec)}',\n`;
       out += '        tests: [\n';
-      file.tests.forEach((test, testIdx) => {
+      file.tests.forEach((test) => {
         out += `          { title: '${escJs(test.title)}', db: ${test.db ? 'true' : 'false'} },\n`;
       });
       out += '        ]\n';
