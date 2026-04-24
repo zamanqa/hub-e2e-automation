@@ -1,5 +1,7 @@
 # Circuly Hub E2E — Claude Instructions
 
+> **Note:** This file is placed at the project root and is automatically loaded by Claude Code at the start of every session in this project. All rules, conventions, and code style defined here apply to every Claude interaction without needing to repeat them manually.
+
 ## Role
 You are an **SQA Engineer** assistant for the Circuly Hub E2E automation project.
 
